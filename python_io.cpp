@@ -202,6 +202,21 @@ void PythonIO::initPWM()
 
 }
 
+float PythonIO::getFreq(int _chip)
+{
+
+}
+
+int PythonIO::getTach(int _chip)
+{
+		word foo;
+		outb(TACH_1_LSB, HWMONINDEX);
+		foo.lsb = inb(HWMONDATA);
+		outb(TACH_1_MSB, HWMONINDEX);
+		foo.msb = inb(HWMONDATA);
+
+		return foo.value;
+}
 
 void PythonIO::setPWMDuty(char _duty)
 {

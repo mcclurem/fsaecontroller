@@ -12,8 +12,11 @@ class PythonIO
 {
 	public:
 		PythonIO();
+		void setPWMDuty(char _duty);
+		int getTach(int _chip);
+		float getFreq(int _chip);
 	private:
-		void initDigitalIO(unsigned int direction);
+		void initDigitalIO(bool chip, unsigned short int direction);
 		void initPWM();
 		/**
 		 * Function to get one byte of digital input
@@ -31,7 +34,6 @@ class PythonIO
 		 * @param io_byte value from 0-3, corresponding to the byte we are interested in
 		 */
 		unsigned short getAnalog(char io_pin);
-		void setPWMDuty(char _duty);
 		void waitOnTransaction();
 
 		unsigned short rSPIControl;//R/W
