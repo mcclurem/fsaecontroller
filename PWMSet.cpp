@@ -15,6 +15,7 @@ int main(int argc, char *argv[]){
 			printf("Setting the Duty Cycle to %d ...\n", value);
 
 			PythonIO* board= new PythonIO();
+			board->initPWM();
 			board->setPWMDuty(value);
 			printf("Done setting PWM\n\nNow testing tach in 0 ...\n");
 			float freq = 1. / ((board->getTach(0) * 0.00001111) / 2. );

@@ -19,6 +19,9 @@ dascontrol: dasmanipulator.cpp
 pwmset: PWMSet.cpp
 		g++ PWMSet.cpp python_io.cpp -o PWMSet
 
+pwmloop: PWMLoop.cpp
+		g++ PWMLoop.cpp python_io.cpp vcmdas.cpp -o PWMLoop
+
 permissions:
 		chown root:root main
 		chmod +s main

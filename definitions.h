@@ -3,26 +3,10 @@
 //io port values
 
 
-#ifndef SPI_PORTS
-#define SPI_PORTS
-
-	#define SPICON1 	0x1D8	//Read/Write - Contains the following : Enable irq usage; Cycle Complete flag; Clock polarity; Clock frequency; Chip select
-	#define SPICON2 	0x1D9	//Read/Write - Essentially written only DATA 1&2 are the actual values, see manual for locaations of bits based upon actual chip we are working with
-	#define SPIDATA1	0x1DA	//Read/Write
-	#define SPIDATA2	0x1DB	//Read/Write
-	#define SPIDATA3	0x1DC	//Read/Write - Writing anything to this initiates a transaction based on current settings of SPICON 1&2
-	#define SPICON3 	0x1DD	//Write Only - Controls the irq that is used
-
-	#define DIG_IO_1	0x06	//Asserted as chip select for onboard chan 0-15 with 1MHz clock
-	#define DIG_IO_2	0x07	//Asserted as chip select for onboard chan 16-31 with 1MHz clock
-
-#endif
 
 #ifndef HWMONCHIP
 #define HWMONCHIP
 
-	#define HWMONINDEX	0xC70
-	#define HWMONDATA	0xC71
 
 	#define PWMCONFIG1	0x5C
 	#define PWMCONFIG2	0x5D
