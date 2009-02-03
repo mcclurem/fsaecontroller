@@ -20,7 +20,8 @@ VCMDAS::VCMDAS(unsigned short base_address, unsigned short _direction)
 		rSPIData = base_address + 9;
 	//Done initializing register variables
 		
-		setDigitalDirection(0);
+		setDigitalDirection(2, 1); //Sets both bytes to inputs
+		loadConfig(0);
 
 
 }
@@ -74,7 +75,7 @@ void VCMDAS::setDigitalDirection(int byte, bool input)
 	outb_p(dataControl, rControl);
 }
 
-unsigned short VCMDAS::getAnalog(unsigned char channel)
+double VCMDAS::getAnalog(unsigned char channel) //THIS IS A Bi-Polar INPUT (hence the signed return val)
 {
 	//*******************ALTERNATIVE, SINGLE INSTRUCTION*******
 		
@@ -94,7 +95,10 @@ unsigned short VCMDAS::getAnalog(unsigned char channel)
 
 //************WARNING WARNING WARNING******************
 //THIS IS CAPABLE OF CREATING AN INFINITE LOOP
+//Added timedout variable to get rid of infinite loops
+		int timedout = 1000;
 		do{
+			timedout--;
 			unsigned char tmpval = inb(rADStatus);
 			if(bitof(7,tmpval))
 			{
@@ -106,9 +110,14 @@ unsigned short VCMDAS::getAnalog(unsigned char channel)
 					break;
 				}
 			}
-		}while(true);
-		
-		return inw(rADLowByte);
+		}while(true && timedout);
+		if(timedout)
+		{
+			return inw(rADLowByte) * 0.0001525878907; // assumes +-5V in
+//			return inw(rADLowByte) * 0.0003051757813; // if +-10V input
+		}
+		else
+			return 0;
 }
 
 void VCMDAS::setAnalog(unsigned char channel, unsigned short data)

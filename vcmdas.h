@@ -15,13 +15,13 @@ class VCMDAS
 	public:
 		VCMDAS(unsigned short base_address, unsigned short _direction);
 		
-		unsigned short getAnalog(unsigned char channel);
+		double getAnalog(unsigned char channel);
 		void setAnalog(unsigned char channel, unsigned short data);
 		
 		void initDigital();
 		unsigned short getDigital();
 		void setDigital(unsigned short data);
-		void setDigitalDirection(int byte, bool input = true);
+		void setDigitalDirection(int byte, bool input);
 		
 		void enableEEPROMWrite();
 		unsigned int readEEPROM(unsigned int address);

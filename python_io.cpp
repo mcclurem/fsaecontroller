@@ -12,11 +12,15 @@ PythonIO::PythonIO()
 		rSPIData2 = 0x1DC;
 		rSPIData3 = 0x1DD;
 
+		rHWMoniterIndex = 0xC70;
+		rHWMoniterData = 0xC71;
+
 		iopl(3);	//Allow us access to ALL ports. We will need root permission and it should
 						//be noted that This is moderately dangerous, however we will be careful.
 						//I promise.
 		//Init_Onboard_Digital();
 		initPWM();
+		initDigitalIO(0xFFFFFFFF);//Set everything to inputs for now
 }
 
 
@@ -44,7 +48,7 @@ unsigned char PythonIO::getDigital(char io_byte)
 		outb( 0x41, rSPIData3 );			//The R/W bit (bit 0) should be 1 == read
 		waitOnTransaction();
 
-		tmp_var = inb(SPIDATA1);
+		tmp_var = inb(rSPIData1);
 		return tmp_var;
 }
 
@@ -55,9 +59,9 @@ void PythonIO::setDigital(char io_byte, unsigned char _data)
 		
 		char gpio_address, chip_address;
 		if(bitof(0, io_byte))
-			gpio_address = 0x13; //GPIO bank B = 0x13
+			gpio_address = 0x12; //GPIO bank B = 0x13
 		else
-			gpio_address = 0x12; //GPIO bank A = 0x12
+			gpio_address = 0x13; //GPIO bank A = 0x12
 
 
 		if(bitof(1, io_byte))
@@ -98,7 +102,7 @@ unsigned short PythonIO::getAnalog(char io_pin)
 
 
 //Function to initialize and configure the digital ports
-void PythonIO::initDigitalIO(bool chip, unsigned short direction)
+void PythonIO::initDigitalIO(unsigned int direction)
 {
 	//All-right, theres a fair ammount of confusion as to what is what
 	//according to the beginning of the manual:
@@ -107,31 +111,35 @@ void PythonIO::initDigitalIO(bool chip, unsigned short direction)
 	//SPIDATA3 = command byte - Which I'm guessing is allways 0x40
 	//Not sure what I believe, but we're going to use that assumption to clean up their code
 	
-	unsigned char byte1, byte2, byte3, byte4;
+	unsigned char byte0, byte1, byte2, byte3;
+	byte0 = direction & 0x000000FF;
+	byte1 = direction & 0x0000FF00 >> 8;
+	byte2 = direction & 0x00FF0000 >> 16;
+	byte3 = direction & 0xFF000000 >> 24;
 		outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
-		outb( 0xFF, rSPIData1 );	//Set all 1's to set all to inputs
+		outb( byte0, rSPIData1 );	//Set all 1's to set all to inputs
 		outb( 0x00, rSPIData2 );	//IODIRA register = 0x00
 		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 
 		outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
-		outb( 0xFF, rSPIData1 );	//Set all 1's to set all to inputs
+		outb( byte1, rSPIData1 );	//Set all 1's to set all to inputs
 		outb( 0x01, rSPIData2 );	//IODIRB register = 0x01
 		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 	//We've now initialized the first chip to all inputs
 		outb( 0x27, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
-		outb( 0xFF, rSPIData1 );	//Set all 1's to set all to inputs
+		outb( byte2, rSPIData1 );	//Set all 1's to set all to inputs
 		outb( 0x00, rSPIData2 );	//IODIRA register = 0x00
 		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 
 		outb( 0x27, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
-		outb( 0xFF, rSPIData1 );	//Set all 1's to set all to inputs
+		outb( byte3, rSPIData1 );	//Set all 1's to set all to inputs
 		outb( 0x01, rSPIData2 );	//IODIRB register = 0x01
 		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
@@ -148,55 +156,56 @@ void PythonIO::initPWM()
 //		ioperm(BASEADDRESS, #OFPORTS, ADDORREMOVEACCESS(bool));
 
 		char tmp_var;
-		outb(0x40, HWMONINDEX);		// Waiting on more info as to what the actual pinout of this port
+		outb(0x40, rHWMoniterIndex);		// Waiting on more info as to what the actual pinout of this port
 										//is, but it is essentially a register selector for the HWMon chip
 										//(ie I have no friggin clue what 0x40 does, I can only assume
 										//that it sets me to a config register on the chip because the ASM tells me to do it)
-		tmp_var = inb(HWMONDATA);		//We need to see the old value to modify it
+		tmp_var = inb(rHWMoniterData);		//We need to see the old value to modify it
 		tmp_var = tmp_var & 0xFE;		// doing a bitmask to disable the first bit (0xFE==11111110)
-		outb(tmp_var, HWMONDATA); 		// Start bit is now off
+		outb(tmp_var, rHWMoniterData); 		// Start bit is now off
 // we've now disabled the chip
 
-		outb(PWMCONFIG1, HWMONINDEX);	//Now we need to put the PWM into manual mode
-		tmp_var = inb(HWMONDATA);
+		outb(PWMCONFIG1, rHWMoniterIndex);	//Now we need to put the PWM into manual mode
+		tmp_var = inb(rHWMoniterData);
 		tmp_var = tmp_var | 0xE0;		//apparently the 3MSBs are in control of manual mode
 										//however, there is some sloppy bitwise manipulation done in the ASM
 										//so this should double-checked
-		outb(tmp_var, HWMONDATA);
+		outb(tmp_var, rHWMoniterData);
 //We've now put PWM1 into manual mode - need to do others if we want them
 		
 //We do in fact have to do the following to all of the PWM's even though we are only using one
-		outb(LOWTEMP1, HWMONINDEX);
-		outb(0x81, HWMONDATA);			//We have to set it to a value other than the default (0x80) and they
+		outb(LOWTEMP1, rHWMoniterIndex);
+		outb(0x81, rHWMoniterData);			//We have to set it to a value other than the default (0x80) and they
 										//suggested 0x81 in the example
-		outb(LOWTEMP2, HWMONINDEX);
-		outb(0x81, HWMONDATA);
-		outb(LOWTEMP3, HWMONINDEX);
-		outb(0x81, HWMONDATA);
+		outb(LOWTEMP2, rHWMoniterIndex);
+		outb(0x81, rHWMoniterData);
+		outb(LOWTEMP3, rHWMoniterIndex);
+		outb(0x81, rHWMoniterData);
 //done setting low temp limit registers
 
 //Now we set the PWM duty-cycle
-		outb(DUTY_CYCLE1, HWMONINDEX);	//Chose the first pwm duty-cycle register
+		outb(DUTY_CYCLE1, rHWMoniterIndex);	//Chose the first pwm duty-cycle register
 //***********************************************************
-		outb(0x80, HWMONDATA);			// we need to fix this value, it affects the position that the PWM is 
+		outb(0x80, rHWMoniterData);			// we need to fix this value, it affects the position that the PWM is 
 										//initialized at (ie the initial servo position)
 //***********************************************************
 //Done setting duty-cycle
 
 //Set the PWM frequency
-		outb(RANGEFREQ1, HWMONINDEX);
-		tmp_var = inb(HWMONDATA);	//we need to read in the old value because we need to rewrite the same upper
+		outb(RANGEFREQ1, rHWMoniterIndex);
+		tmp_var = inb(rHWMoniterData);	//we need to read in the old value because we need to rewrite the same upper
 									//nibble, only the lower nibble affects frequency
 		tmp_var = tmp_var & 0xF0;	// clear the lower nibble
-		tmp_var = tmp_var | 0x06;	//58.6Hz, we may want to decide on a diff value depending on the servo we chose
+		tmp_var = tmp_var | 0x07;	//87.7Hz, we may want to decide on a diff value depending on the servo we chose
+		outb(tmp_var, rHWMoniterData);
 //Done setting the frequency
 
 //Now we have to re-enable the chip
-		outb(0x40, HWMONINDEX);
-		tmp_var = inb(HWMONDATA);
+		outb(0x40, rHWMoniterIndex);
+		tmp_var = inb(rHWMoniterData);
 
 		tmp_var = tmp_var | 0x01;	//Re-enable the start-bit
-		outb(tmp_var, HWMONDATA);
+		outb(tmp_var, rHWMoniterData);
 //Done re-enabling
 
 
@@ -204,24 +213,27 @@ void PythonIO::initPWM()
 
 float PythonIO::getFreq(int _chip)
 {
-
+		return 1./((float)getTach(_chip) * 0.0000111);
 }
 
 int PythonIO::getTach(int _chip)
 {
+	//LSB = 0x28, MSB = 0x29 ; + chip*2
 		word foo;
-		outb(TACH_1_LSB, HWMONINDEX);
-		foo.lsb = inb(HWMONDATA);
-		outb(TACH_1_MSB, HWMONINDEX);
-		foo.msb = inb(HWMONDATA);
+		//outb(TACH_1_LSB, rHWMoniterIndex);  OLD VERSION
+		outb((0x28 + _chip * 2), rHWMoniterIndex); 
+		foo.lsb = inb(rHWMoniterData);
+		//outb(TACH_1_MSB, rHWMoniterIndex); OLD VERSION
+		outb((0x29 + _chip * 2), rHWMoniterIndex);
+		foo.msb = inb(rHWMoniterData);
 
 		return foo.value;
 }
 
 void PythonIO::setPWMDuty(char _duty)
 {
-	outb(DUTY_CYCLE1, HWMONINDEX);	//choose the first pwm duty-cycle register
-	outb(_duty, HWMONDATA);
+	outb(DUTY_CYCLE1, rHWMoniterIndex);	//choose the first pwm duty-cycle register
+	outb(_duty, rHWMoniterData);
 }
 
 
@@ -233,6 +245,6 @@ void PythonIO::waitOnTransaction()
 		{
 				tmp_var = inb(rSPIStatus);	//Read in and we need to check if the done bit is set
 				tmp_var = tmp_var & 0x01;	//Isolate the done bit
-		}while(tmp_var != 0x01);
+		}while(tmp_var == 0x01);
 }
 

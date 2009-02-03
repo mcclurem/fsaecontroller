@@ -10,6 +10,7 @@ int main(){
 	int arg1;
 	int arg2;
 	VCMDAS* das = new VCMDAS(0x0300,0x0000);
+	das->enableEEPROMWrite();
 	
 	do{
 		printf("\n\nPlease enter your desired action:\n");
@@ -25,7 +26,9 @@ int main(){
 				printf("Bad argument...\n");
 				continue;
 			}
-			printf("Value is %d\n", das->getAnalog(arg1));
+			int avgval = (int)((das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1))/8);
+			printf("Value is %d\n", avgval);
+			//printf("Value is %d\n", das->getAnalog(arg1));
 			continue;
 		}
 		if(strcmp(function, "AO") == 0 || strcmp(function, "ao") == 0 || strcmp(function, "setAnalog") == 0)
@@ -118,18 +121,50 @@ int main(){
 			das->writeDPot(arg1, arg2);
 			continue;
 		}
-		if(strcmp(function, "calib") == 0)
+		if(strcmp(function, "inpu") == 0)
 		{
+				printf("This function will set the analog input offset voltage - Please connect pin 1 to pin 3 on header J2. When finished press any key to begin\n");
+
+		}
+		if(strcmp(function, "outputgain") == 0)
+		{
+				printf("This function will set the output gain. Please be sure that the loopback jumpers are connected\n");
+				das->writeDPot(1, 0);
+				das->writeDPot(3, 0);
+
+				das->setAnalog(0, 4095);
+				unsigned char value = 0;
+				do{
+					int tmpval = (int)((das->getAnalog(14) + das->getAnalog(14) + das->getAnalog(14) + das->getAnalog(14))/4);
+					if( (32767 - tmpval) < 10)
+							break;
+					value++;
+					das->writeDPot(1, value);
+				}while(value < 250);
+				printf("Channel 0 gain is %d\n",value);
+				value = 0;
+				do{
+					int tmpval = (int)((das->getAnalog(15) + das->getAnalog(15) + das->getAnalog(15) + das->getAnalog(15))/4);
+					if( (32767 - tmpval) < 10)
+							break;
+					value++;
+					das->writeDPot(3, value);
+				}while(value < 250);
+				printf("Channel 1 gain is %d\n",value);
+		}
+		if(strcmp(function, "inputgaincalib") == 0)
+		{ 
 			int input_channel;
 			int target_value;
 			printf("This takes two arguments, they are the mathematically calculated value that the converter should read and the channel you are reading (to set it to that number) while you modulate the gain\n");
+			printf("(Attach a  voltage source to some input and we are going to change the gain until it reads the correct value according to the external voltage measuring device)");
 			printf("What shall I use as the channel to use for adjusting the gain?\n");
 			if(scanf("%d", &input_channel) == 0)
 			{
 				printf("Bad argument...\n");
 				continue;
 			}
-			printf("What is the value I'm trying to make this channel?");
+			printf("What is the value I'm trying to make this channel? (input voltage/(20/65536))");
 			if(scanf("%d", &target_value) == 0)
 			{
 				printf("Bad argument...\n");
@@ -165,7 +200,7 @@ int main(){
 							average_val += das->getAnalog(input_channel);
 						average_val /= 5;
 						printf("average_val was %d\n", average_val);
-						if( abs(average_val - target_value) < 4)
+						if( abs(average_val - target_value) < 8)
 								break;
 						if( average_val < target_value && pot_val !=1)
 						{
@@ -201,7 +236,8 @@ int main(){
 				printf("\twriteEEPROM\n");
 				printf("\tread == readEEPROM\n");
 				printf("\tdpot == writeDPot\n");
-				printf("\tcalib\n");
+				printf("\tinputgaincalib\n");
+				printf("\toutputgain\n");
 				printf("\texit\n");
 		}
 	}while(true);
