@@ -16,11 +16,11 @@ main.o: main.cpp
 dascontrol: dasmanipulator.cpp
 		g++ dasmanipulator.cpp vcmdas.cpp -o dascontrol
 
-pwmset: PWMSet.cpp
-		g++ PWMSet.cpp python_io.cpp -o PWMSet
+pwmset: pwmset.cpp
+		g++ pwmset.cpp python_io.cpp -o pwmset
 
-pwmloop: PWMLoop.cpp
-		g++ PWMLoop.cpp python_io.cpp vcmdas.cpp -o PWMLoop
+pwmloop: pwmloop.cpp
+		g++ pwmloop.cpp python_io.cpp vcmdas.cpp -o pwmloop
 
 permissions:
 		chown root:root main
