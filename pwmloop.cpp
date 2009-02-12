@@ -8,7 +8,7 @@ int main(int argc, char *argv[]){
 
 	PythonIO* board= new PythonIO();
 	board->initPWM();
-	VCMDAS* das = new VCMDAS(0x300, 0x0000);
+	VCMDAS* das = new VCMDAS();
 	do
 	{
 		double value = das->getAnalog(0);

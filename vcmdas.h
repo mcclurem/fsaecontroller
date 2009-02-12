@@ -13,7 +13,7 @@
 class VCMDAS
 {
 	public:
-		VCMDAS(unsigned short base_address, unsigned short _direction);
+		VCMDAS(unsigned short base_address = 0x300);
 		
 		double getAnalog(unsigned char channel);
 		void setAnalog(unsigned char channel, unsigned short data);

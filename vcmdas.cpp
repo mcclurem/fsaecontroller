@@ -3,7 +3,7 @@
 #include "vcmdas.h"
 #include "definitions.h"
 
-VCMDAS::VCMDAS(unsigned short base_address, unsigned short _direction)
+VCMDAS::VCMDAS(unsigned short base_address)
 {
 		iopl(3);	//Allow us access to ALL ports. We will need root permission and it should
 	//need to initialize all the register address variables
