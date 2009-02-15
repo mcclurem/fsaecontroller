@@ -7,8 +7,10 @@ rm -f /tmp/ramdisk.img
 rm -f /tmp/ramdisk.img.gz
 
 # Ramdisk Constants
-RDSIZE=4000
+RDSIZE=4096
 BLKSIZE=1024
+#ROOTDEV="sda5"
+ROOTDEV=$(awk '/^[ \t]*[^#]/ { if ($2 == "/") { print $1; }}' /etc/fstab | cut -d/ -f3)
 
 # Create an empty ramdisk image
 dd if=/dev/zero of=/tmp/ramdisk.img bs=$BLKSIZE count=$RDSIZE
@@ -25,19 +27,24 @@ mkdir /mnt/initrd/sys
 mkdir /mnt/initrd/dev
 mkdir /mnt/initrd/proc
 mkdir /mnt/initrd/lib
+mkdir /mnt/initrd/new_root
 
 # Grab busybox and create the symbolic links
-pushd /mnt/initrd/bin
-cp /usr/local/src/busybox-1.1.1/busybox .
+cd /mnt/initrd/bin
+cp /home/mcclurem/fuck/busybox-1.13.2/busybox .
+#cp /usr/local/src/busybox-1.1.1/busybox .
 ln -s busybox ash
 ln -s busybox mount
+ln -s busybox mkdir
 ln -s busybox echo
 ln -s busybox ls
 ln -s busybox cat
 ln -s busybox ps
 ln -s busybox dmesg
 ln -s busybox sysctl
-popd
+ln -s busybox pivot_root
+
+cd
 
 # Grab the necessary dev files
 cp -a /dev/console /mnt/initrd/dev
@@ -46,11 +53,12 @@ cp -a /dev/ram0 /mnt/initrd/dev
 cp -a /dev/null /mnt/initrd/dev
 cp -a /dev/tty1 /mnt/initrd/dev
 cp -a /dev/tty2 /mnt/initrd/dev
+cp -a /dev/$ROOTDEV /mnt/initrd/dev
 
 # Equate sbin with bin
-pushd /mnt/initrd
+cd /mnt/initrd
 ln -s bin sbin
-popd
+cd 
 
 # Create the init file
 cat >> /mnt/initrd/linuxrc << EOF
@@ -58,11 +66,15 @@ cat >> /mnt/initrd/linuxrc << EOF
 echo
 echo "Simple initrd is active"
 echo
-LD_LIBRARY_PATH=/lib
-export LD_LIBRARY_PATH
 mount -t proc /proc /proc
 mount -t sysfs none /sys
-/bin/ash --login
+mount /dev/$ROOTDEV /new_root
+cd /new_root
+echo 0x0100 >/proc/sys/kernel/real-root-dev
+pivot_root . ./mnt/initrd # same as in initrd.txt
+#chroot . /sbin/init</dev/console 2>/dev/console # same as in initrd.txt
+exec chroot . /sbin/init </dev/console >/dev/console 2>&1
+#/bin/ash --login
 EOF
 
 chmod +x /mnt/initrd/linuxrc
