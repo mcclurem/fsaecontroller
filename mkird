@@ -12,6 +12,11 @@ BLKSIZE=1024
 #ROOTDEV="sda5"
 ROOTDEV=$(awk '/^[ \t]*[^#]/ { if ($2 == "/") { print $1; }}' /etc/fstab | cut -d/ -f3)
 
+if [ ! -d /boot/grub ]; then
+		echo "Mounting Boot..."
+		mount /boot
+fi
+
 # Create an empty ramdisk image
 dd if=/dev/zero of=/tmp/ramdisk.img bs=$BLKSIZE count=$RDSIZE
 
