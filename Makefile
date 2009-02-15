@@ -20,7 +20,7 @@ pwmset: pwmset.cpp
 		g++ pwmset.cpp python_io.cpp -o pwmset
 
 pwmloop: pwmloop.cpp
-		g++ pwmloop.cpp python_io.cpp vcmdas.cpp -o pwmloop
+		g++ -static pwmloop.cpp python_io.cpp vcmdas.cpp -o pwmloop
 
 permissions:
 		chown root:root main

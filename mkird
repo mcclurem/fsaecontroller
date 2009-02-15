@@ -6,10 +6,9 @@
 rm -f /tmp/ramdisk.img
 rm -f /tmp/ramdisk.img.gz
 
-# Ramdisk Constants
+# Ramdisk Constants - These MUST match kernel params in order to boot
 RDSIZE=4096
 BLKSIZE=1024
-#ROOTDEV="sda5"
 ROOTDEV=$(awk '/^[ \t]*[^#]/ { if ($2 == "/") { print $1; }}' /etc/fstab | cut -d/ -f3)
 
 if [ ! -d /boot/grub ]; then
@@ -76,10 +75,10 @@ mount -t sysfs none /sys
 mount /dev/$ROOTDEV /new_root
 cd /new_root
 echo 0x0100 >/proc/sys/kernel/real-root-dev
-pivot_root . ./mnt/initrd # same as in initrd.txt
-#chroot . /sbin/init</dev/console 2>/dev/console # same as in initrd.txt
+pivot_root . ./mnt/initrd
+umount /mnt/initrd/proc
+/bin/bash --login
 exec chroot . /sbin/init </dev/console >/dev/console 2>&1
-#/bin/ash --login
 EOF
 
 chmod +x /mnt/initrd/linuxrc
