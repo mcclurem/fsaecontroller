@@ -30,12 +30,12 @@ unsigned char PythonIO::getDigital(char io_byte)
 	
 	//****NB****
 	//THIS ENTIRE METHOD IS SPECIFIC TO THE REV6 BOARD
-		
+	//PORTA and PORTB are swapped!!!!
 		unsigned char gpio_address, chip_address, tmp_var;
 		if(bitof(0, io_byte))
-			gpio_address = 0x13; //GPIO bank B = 0x13
+			gpio_address = 0x12; //GPIO bank B = 0x13
 		else
-			gpio_address = 0x12; //GPIO bank A = 0x12
+			gpio_address = 0x13; //GPIO bank A = 0x12
 
 		if(bitof(1, io_byte))
 			outb( 0x27, rSPIControl ); //Dig I/O chip 1 (see ref manual for bitwise breakdown)
@@ -111,6 +111,21 @@ void PythonIO::initDigitalIO(unsigned int direction)
 	//SPIDATA3 = command byte - Which I'm guessing is allways 0x40
 	//Not sure what I believe, but we're going to use that assumption to clean up their code
 	
+	outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
+	outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+	outb( 0xFF, rSPIData1 );
+	outb( 0x0C, rSPIData2 ); //GPPUA
+	outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
+	waitOnTransaction();
+	
+	outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
+	outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+	outb( 0xFF, rSPIData1 );
+	outb( 0x0D, rSPIData2 ); //GPPUB
+	outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
+	waitOnTransaction();
+	
+	
 	unsigned char byte0, byte1, byte2, byte3;
 	byte0 = direction & 0x000000FF;
 	byte1 = direction & 0x0000FF00 >> 8;
@@ -122,6 +137,7 @@ void PythonIO::initDigitalIO(unsigned int direction)
 		outb( 0x00, rSPIData2 );	//IODIRA register = 0x00
 		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
+
 
 		outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
