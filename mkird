@@ -35,7 +35,7 @@ rm -f /tmp/ramdisk.img
 rm -f /tmp/ramdisk.img.gz
 
 # Ramdisk Constants - These MUST match kernel params in order to boot
-RDSIZE=4096
+RDSIZE=$(grep "CONFIG_BLK_DEV_RAM_SIZE" /usr/src/linux/.config |grep -o -E "[0-9]+")
 BLKSIZE=1024
 ROOTDEV=$(awk '/^[ \t]*[^#]/ { if ($2 == "/") { print $1; }}' /etc/fstab | cut -d/ -f3)
 
