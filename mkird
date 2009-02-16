@@ -1,6 +1,34 @@
 #!/bin/bash
 # Partly courtesy of http://www.ibm.com/developerworks/linux/library/l-initrd.html
 
+while [ $# -gt 0 ]; do
+	case $1 in
+		--usage)
+			echo "mkird [statically linked program] ..."
+			shift
+			;;
+		*)
+			if [ -x $1 ]; then
+					if [ $(file $1|grep -c "statically linked") != 0 ]; then
+						EXECUTABLES="$EXECUTEABLES $1"
+				else
+						echo "$1 doesn't seem to be a statically linked binary and so it will break the initrd image... not including it"
+				fi
+			else
+				echo "$1 does not seem to exist or is not executable... Please check your arguments"
+				exit 1
+			fi
+			shift
+			;;
+	esac
+done
+
+echo $EXECUTABLES
+
+if [ $(whoami) != root ]; then
+	echo "You need to be root to run this"
+	exit 0
+fi
 
 # Housekeeping...
 rm -f /tmp/ramdisk.img
@@ -33,10 +61,18 @@ mkdir /mnt/initrd/proc
 mkdir /mnt/initrd/lib
 mkdir /mnt/initrd/new_root
 
+#Copy in all the binaries you want to run
+for BINARY in $EXECUTABLES
+do
+	strip $BINARY
+	cp $BINARY /mnt/initrd/bin
+	chmod +x /mnt/initrd/bin
+done
+
 # Grab busybox and create the symbolic links
 cd /mnt/initrd/bin
 cp /home/mcclurem/fuck/busybox-1.13.2/busybox .
-#cp /usr/local/src/busybox-1.1.1/busybox .
+
 ln -s busybox ash
 ln -s busybox mount
 ln -s busybox mkdir
@@ -72,6 +108,14 @@ echo "Simple initrd is active"
 echo
 mount -t proc /proc /proc
 mount -t sysfs none /sys
+EOF
+
+for BINARY in $EXECUTABLES
+do
+	echo "/bin/$BINARY" >> /mnt/initrd/linuxrc
+done
+
+cat >> /mnt/initrd/linuxrc << EOF
 mount /dev/$ROOTDEV /new_root
 cd /new_root
 echo 0x0100 >/proc/sys/kernel/real-root-dev
@@ -82,6 +126,9 @@ exec chroot . /sbin/init </dev/console >/dev/console 2>&1
 EOF
 
 chmod +x /mnt/initrd/linuxrc
+
+echo "The image is $(df |grep initrd| awk '{print $5}') full"
+
 
 # Finish up...
 umount /mnt/initrd
