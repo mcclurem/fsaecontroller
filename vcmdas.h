@@ -15,6 +15,7 @@ class VCMDAS
 	public:
 		VCMDAS(unsigned short base_address = 0x300);
 		
+		short getRawAnalog(unsigned char channel);
 		double getAnalog(unsigned char channel);
 		void setAnalog(unsigned char channel, unsigned short data);
 		

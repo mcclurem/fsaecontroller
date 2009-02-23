@@ -75,7 +75,7 @@ void VCMDAS::setDigitalDirection(int byte, bool input)
 	outb_p(dataControl, rControl);
 }
 
-double VCMDAS::getAnalog(unsigned char channel) //THIS IS A Bi-Polar INPUT (hence the signed return val)
+short VCMDAS::getAnalog(unsigned char channel) //THIS IS A Bi-Polar INPUT (hence the signed return val)
 {
 	//*******************ALTERNATIVE, SINGLE INSTRUCTION*******
 		
@@ -113,11 +113,17 @@ double VCMDAS::getAnalog(unsigned char channel) //THIS IS A Bi-Polar INPUT (henc
 		}while(true && timedout);
 		if(timedout)
 		{
-			return inw(rADLowByte) * 0.0001525878907; // assumes +-5V in
+			return inw(rADLowByte);
+//			return inw(rADLowByte) * 0.0001525878907; // assumes +-5V in
 //			return inw(rADLowByte) * 0.0003051757813; // if +-10V input
 		}
 		else
 			return 0;
+}
+double VCMDAS::getAnalog(unsigned char channel)
+{
+		return getRawAnalog(channel) * 0.0001525878907; // assumes +-5V in
+//		return getRawAnalog(channel) * 0.0003051757813; // if +-10V input
 }
 
 void VCMDAS::setAnalog(unsigned char channel, unsigned short data)
