@@ -26,9 +26,9 @@ int main(){
 				printf("Bad argument...\n");
 				continue;
 			}
-			int avgval = (int)((das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1) + das->getAnalog(arg1))/8);
+			int avgval = (int)((das->getRawAnalog(arg1) + das->getRawAnalog(arg1) + das->getRawAnalog(arg1) + das->getRawAnalog(arg1) + das->getRawAnalog(arg1) + das->getRawAnalog(arg1) + das->getRawAnalog(arg1) + das->getRawAnalog(arg1))/8);
 			printf("Value is %d\n", avgval);
-			//printf("Value is %d\n", das->getAnalog(arg1));
+			//printf("Value is %d\n", das->getRawAnalog(arg1));
 			continue;
 		}
 		if(strcmp(function, "AO") == 0 || strcmp(function, "ao") == 0 || strcmp(function, "setAnalog") == 0)
@@ -135,7 +135,7 @@ int main(){
 				das->setAnalog(0, 4095);
 				unsigned char value = 0;
 				do{
-					int tmpval = (int)((das->getAnalog(14) + das->getAnalog(14) + das->getAnalog(14) + das->getAnalog(14))/4);
+					int tmpval = (int)((das->getRawAnalog(14) + das->getRawAnalog(14) + das->getRawAnalog(14) + das->getRawAnalog(14))/4);
 					if( (32767 - tmpval) < 10)
 							break;
 					value++;
@@ -144,7 +144,7 @@ int main(){
 				printf("Channel 0 gain is %d\n",value);
 				value = 0;
 				do{
-					int tmpval = (int)((das->getAnalog(15) + das->getAnalog(15) + das->getAnalog(15) + das->getAnalog(15))/4);
+					int tmpval = (int)((das->getRawAnalog(15) + das->getRawAnalog(15) + das->getRawAnalog(15) + das->getRawAnalog(15))/4);
 					if( (32767 - tmpval) < 10)
 							break;
 					value++;
@@ -176,7 +176,7 @@ int main(){
 			do
 			{
 				printf("pot_val is %d\n", pot_val);
-				tmp_reading = das->getAnalog(input_channel);
+				tmp_reading = das->getRawAnalog(input_channel);
 				if( tmp_reading < target_value && pot_val !=1)
 				{
 						pot_val--;
@@ -197,7 +197,7 @@ int main(){
 					{
 						//get average of 5 values
 						for(int i=0; i<5; i++)
-							average_val += das->getAnalog(input_channel);
+							average_val += das->getRawAnalog(input_channel);
 						average_val /= 5;
 						printf("average_val was %d\n", average_val);
 						if( abs(average_val - target_value) < 8)
