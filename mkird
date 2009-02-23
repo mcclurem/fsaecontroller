@@ -70,8 +70,8 @@ do
 done
 
 # Grab busybox and create the symbolic links
+cp ./busybox-1.13.2/busybox /mnt/initrd/bin
 cd /mnt/initrd/bin
-cp /home/mcclurem/fuck/busybox-1.13.2/busybox .
 
 ln -s busybox ash
 ln -s busybox mount
@@ -121,7 +121,7 @@ cd /new_root
 echo 0x0100 >/proc/sys/kernel/real-root-dev
 pivot_root . ./mnt/initrd
 umount /mnt/initrd/proc
-/bin/bash --login
+#/bin/bash --login
 exec chroot . /sbin/init </dev/console >/dev/console 2>&1
 EOF
 
