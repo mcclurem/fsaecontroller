@@ -127,22 +127,23 @@ void PythonIO::initDigitalIO(unsigned int direction)
 	
 	
 	unsigned char byte0, byte1, byte2, byte3;
-	byte0 = direction & 0x000000FF;
-	byte1 = direction & 0x0000FF00 >> 8;
-	byte2 = direction & 0x00FF0000 >> 16;
-	byte3 = direction & 0xFF000000 >> 24;
+	byte0 = (direction & 0x000000FF);
+	byte1 = (direction & 0x0000FF00) >> 8;
+	byte2 = (direction & 0x00FF0000) >> 16;
+	byte3 = (direction & 0xFF000000) >> 24;
+
+	printf("DIR 0=%d, DIR 1=%d, DIR 2=%d, DIR 3=%d\n", byte0, byte1, byte2, byte3);
 		outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte0, rSPIData1 );	//Set all 1's to set all to inputs
-		outb( 0x00, rSPIData2 );	//IODIRA register = 0x00
+		outb( 0x01, rSPIData2 );	//IODIRA register = 0x00
 		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
-
 
 		outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte1, rSPIData1 );	//Set all 1's to set all to inputs
-		outb( 0x01, rSPIData2 );	//IODIRB register = 0x01
+		outb( 0x00, rSPIData2 );	//IODIRB register = 0x01
 		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 	//We've now initialized the first chip to all inputs
