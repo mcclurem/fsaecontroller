@@ -8,8 +8,24 @@ int main(int argc, char *argv[]){
 
 	PythonIO* board= new PythonIO();
 	VCMDAS* das = new VCMDAS();
+	board->initDigitalIO(0xFFFFFF00);
+	
+	/*for(unsigned char i=0; i<=255; i++)
+	{
+			if(board->getDigital(1) < 255)
+				usleep(100000);
+			else
+				usleep(1000000);
+			board->setDigital(0,i);
+	}*/
+	do
+	{
+			board->setDigital(0, board->getDigital(1));
+	}while(true);
 	unsigned char dig1 = board->getDigital(0);
-	if(!(dig1 & 0x01))
+	unsigned char dig2 = board->getDigital(1);
+	printf("%d\t%d\n", dig1, dig2);
+//	if(!(dig1 & 0x01))
 		return 0;
 	
 	board->initPWM();
