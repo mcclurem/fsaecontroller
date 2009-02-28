@@ -75,7 +75,7 @@ void VCMDAS::setDigitalDirection(int byte, bool input)
 	outb_p(dataControl, rControl);
 }
 
-short VCMDAS::getAnalog(unsigned char channel) //THIS IS A Bi-Polar INPUT (hence the signed return val)
+short VCMDAS::getRawAnalog(unsigned char channel) //THIS IS A Bi-Polar INPUT (hence the signed return val)
 {
 	//*******************ALTERNATIVE, SINGLE INSTRUCTION*******
 		
