@@ -5,7 +5,7 @@ CXXFLAGS="-O1"
 all: binary dataparser 
 
 binary: main.o
-	    g++ main.o -o main
+	    g++ main.o python_io.cpp -o main
 
 dataparser: dataparse.cpp
 	    g++ dataparse.cpp -o dataparser

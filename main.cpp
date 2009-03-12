@@ -2,46 +2,65 @@
 
 #include <stdio.h>
 #include "vcmdas.h"
+#include "python_io.h"
 #include "mytime.h"
 
 
 //The goal of these macros is to have them be boolean equivalents
 //in order to test the individual inputs
-#define GAS_ENABLE (digital_In & 0x01)
-#define ELECTRIC_ENABLE ((digital_In > 1) & 0x01)
-#define HYBRID_ENABLE (GAS_ENABLE & ELECTRIC_ENABLE)
+#define GAS_ENABLED (digital_in1 & 0x01)
+#define ELECTRIC_ENABLED ((digital_in1 > 1) & 0x01)
+#define HYBRID_ENABLED (GAS_ENABLED & ELECTRIC_ENABLED)
 
-#define READY (digital_Out1 = digital_Out1 | 0x80)
-#define FAULT (digital_Out1 = digital_Out1 | 0xC0)
+#define READY (digital_out1 = digital_out1 | 0x80)
+#define FAULT (digital_out1 = digital_out1 | 0xC0)
 
+/*
+ * This is just a function to return a PWM duty from a percentage value
+ */
+inline unsigned char ThrottleCalc(double percentage)
+{
+	const double max_duty = 40; // using this so that we can adjust our endpoints of servo travel
+	const double min_duty = 22;
+	unsigned char retval;
+	retval = (unsigned char)(((max_duty - min_duty) * percentage) + min_duty);
+	if(retval < min_duty)
+			retval = min_duty;
+	if(retval > max_duty)
+			retval = max_duty;
+	return retval;
+};
 
 int main(){
 //We need to set up some globals for storing info
-//I believe pointers would be bad because we want fast access times
-	
-	short int pedal_Position;
+	double pedal_position; //Normalized number from 0-1
 	int engine_RPM;
-	float gear_Ratio;
-	int array_Voltage;
-	char digital_In;
-	char digital_Out1;
-	char digital_Out2;
-	int throttle_Position; //A number between 0 and 100
+	float gear_ratio;
+	int array_voltage;
+	unsigned char digital_in1; //Bits 0-7
+	unsigned char digital_in2; //Bits 24-31
+	unsigned char digital_out1; //Bits 8-15
+	unsigned char digital_out2; //Bits 16-23
+	unsigned char throttle_pos = 0; //The PWM duty cycle
+	
+	PythonIO * board = new PythonIO();
+	VCMDAS * das = new VCMDAS();
+	board->initDigitalIO(0xFF0000FF);
 
-	Init_IO(); //We need to perform a handful of initializations
 //the infinite loop
 	READY;
 	do{
 		//Begin inputs
-
-		pedal_Position = DAS_Get_Analog(0); 
-		digital_In = Get_Digital();
+//***************************************************
+		pedal_position = (das->getAnalog(0))/5.; //NB: assumes DAS is set in +-5V mode
+		digital_in1 = board->getDigital(0);
+		digital_in2 = board->getDigital(3);
 
 		//End inputs
 
 		//Begin math block
-		if( !HYBRID_ENABLE ){
-				if(ELECTRIC_ENABLE){
+		if( !HYBRID_ENABLED ){
+				if(ELECTRIC_ENABLED){
 						//We throw the clutch on the gas and use the pedal position to control electric motor
 
 						//pull clutch or engage neutral gas
@@ -51,16 +70,23 @@ int main(){
 					//electric throttle directly prop pedal-position
 					//
 				}
-				if(GAS_ENABLE){
+				if(GAS_ENABLED){
 						//We just use the pedal position to control throttle position and set electric to neutral
-						
-						//Send CAN message neutral
+
+						//We want to avoid constantly reseting the PWM:
+						if(ThrottleCalc(pedal_position) != throttle_pos)
+						{
+								throttle_pos = ThrottleCalc(pedal_position);
+								board->setPWMDuty(throttle_pos);
+						}
+						//Force the electric motor to free-wheel:
+						digital_out1 &= (0x0F|0x80|0x10); //should yield binary: 10011111
 						
 						//Throttle = pedal-position
 					//electric throttle off
 					//regen most DEFINITELY off
 				}
-				if(!GAS_ENABLE && !ELECTRIC_ENABLE){
+				if(!GAS_ENABLED && !ELECTRIC_ENABLED){
 					//gas servo closed
 					//electric throttle off
 					//regen off
@@ -73,7 +99,7 @@ int main(){
 				//assisting equations:
 					//if(bank_voltage > 72v){electric throttle is >=0;} //gas does all the work unhindered and electric can only help
 					//else {electric throttle = 
-				if(bank_voltage > 72)
+				/*if(bank_voltage > 72)
 				{
 						//something a little trickier that does some kind of down-ramping
 				}else
@@ -87,7 +113,7 @@ int main(){
 								GAS_OUT = 100;
 								ELECTRIC_OUT = ((request * NET_TORQUE) - GAS_TORQUE)/NET_TORQUE;
 						}
-				}
+				}*/
 
 
 
@@ -96,6 +122,9 @@ int main(){
 		
 		//Begin Outputs
 		
+		board->setDigital(1, digital_out1);
+		board->setDigital(2, digital_out2);
+
 		//End Outputs
 	}while(true);
 //end infinite loop - wait isn't that an oxy-moron?
