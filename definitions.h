@@ -55,14 +55,17 @@ union word{
 //0 = Gas pedal
 
 
-//**************Digital Outs**************
-//Bit			0 |  1  |  2  |  3  |  4  |     5       |   6   |   7
-//Function		N | 1st | 2nd | 3rd | 4th | Shift light | Stat1 | Stat2
 //
-//Bit			  0    |    1     |     2      |
-//Function		Clutch | Up-Shift | Down-Shift |
+//**************Onboard IOs***************
 //
-//**************Digital Ins***************
+//IN			     0     |     1       |   2   |  3  |  4  |    5     |    6       |    7
+//Function		Gas-Enable | Elec-Enable | Start | SW1 | SW2 | Shift-Up | Shift-Down | Clutch
 //
-//Bit			     0     |     1       |   2    |    3     |    4   |    5     |    6       |
-//Function		Gas-Enable | Elec-Enable | E-Stop | Ignition | Clutch | Shift-Up | Shift-Down |
+//OUT			 8   |  9   |  10  |  11  |  12  |    13    |    14     |   15
+//Function		LED1 | LED2 | LED3 | LED4 | LED5 | Throt-EN | Brake-EN
+//
+//OUT			  16   |   17     |    18      |    19   |    20   |    21   |   22   |   23
+///Function		Clutch | Shift-up | Shift-down | Bank-en | Fans-en | Fuel-en | ign-en | Starter
+//
+//IN			  24
+//Function		E-stop
