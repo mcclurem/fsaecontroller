@@ -41,6 +41,20 @@ inline unsigned short bitof(unsigned char _bit_number, unsigned short _data)
 	return ((_data >> _bit_number) & 0x01);
 };
 
+inline void bitset(unsigned char bit, unsigned char* byte)
+{
+		if( bit > 7 )
+				return;
+		*byte |= (0x01 << bit);
+};
+
+inline void bitunset(unsigned char bit, unsigned char* byte)
+{
+		if( bit > 7 )
+				return;
+		*byte &= (~(0x01 << bit));
+};
+
 union word{
 		struct {
 			//NOTE THE ORDER!!!!!!, THIS IS BECAUSE OF LITTLE ENDIAN ARCHITECHTURE
@@ -52,7 +66,29 @@ union word{
 #endif
 
 //**************Analog Ins(VCMDAS)***************
-//0 = Gas pedal
+//00 = Gas pedal
+//01 = Brake pedal
+//02 = Water temp
+//03 = TPS
+//04 = Wheel Speed Sensor
+//05 = Gas Pressure
+//06 = Cap 0 temp
+//07 = Cap 1 temp
+//08 = Cap 2 temp
+//09 = cap 3 temp
+//10 = Cap 4 temp
+//11 = Cap 5 temp
+//12 = Cap 6 temp
+//13 = Bank Voltage
+//14 =
+//15 =
+//
+//*************Digital Ins(VCMDAS)**************
+//00-06 = Cap 0-6 Warn Signal
+//07 = Free
+//08-14 = Cap 0-6 Stop Signal
+//15 = Free
+//
 
 
 //
@@ -62,10 +98,10 @@ union word{
 //Function		Gas-Enable | Elec-Enable | Start | SW1 | SW2 | Shift-Up | Shift-Down | Clutch
 //
 //OUT			 8   |  9   |  10  |  11  |  12  |    13    |    14     |   15
-//Function		LED1 | LED2 | LED3 | LED4 | LED5 | Throt-EN | Brake-EN
+//Function		LED1 | LED2 | LED3 | LED4 | LED5 | Throt-EN | Brake-EN  |
 //
 //OUT			  16   |   17     |    18      |    19   |    20   |    21   |   22   |   23
 ///Function		Clutch | Shift-up | Shift-down | Bank-en | Fans-en | Fuel-en | ign-en | Starter
 //
-//IN			  24
-//Function		E-stop
+//IN			  24   |      25      |     26     |  27  |  28  |  29  |  30  |  31
+//Function		E-stop | Oil Pressure | Boot-Linux | Free | Free | Free | Free | Free
