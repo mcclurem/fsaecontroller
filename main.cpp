@@ -42,6 +42,7 @@ int main(){
 	unsigned char digital_out1; //Bits 8-15
 	unsigned char digital_out2; //Bits 16-23
 	unsigned char throttle_pos = 0; //The PWM duty cycle
+	int previous_state = 0;
 	
 	PythonIO * board = new PythonIO();
 	VCMDAS * das = new VCMDAS();
@@ -69,10 +70,12 @@ int main(){
 					//gas servo closed
 					//electric throttle directly prop pedal-position
 					//
+					previous_state = 1;
 				}
 				if(GAS_ENABLED){
 						//We just use the pedal position to control throttle position and set electric to neutral
 
+						//Throttle = pedal-position
 						//We want to avoid constantly reseting the PWM:
 						if(ThrottleCalc(pedal_position) != throttle_pos)
 						{
@@ -80,16 +83,17 @@ int main(){
 								board->setPWMDuty(throttle_pos);
 						}
 						//Force the electric motor to free-wheel:
-						digital_out1 &= (0x0F|0x80|0x10); //should yield binary: 10011111
-						
-						//Throttle = pedal-position
-					//electric throttle off
-					//regen most DEFINITELY off
+						bitunset(5, &digital_out1); //electric throttle off
+						bitunset(6, &digital_out1); //regen most DEFINITELY off
+
+						//digital_out1 &= (0x0F|0x80|0x10); //should yield binary: 10011111
+						previous_state=2
 				}
 				if(!GAS_ENABLED && !ELECTRIC_ENABLED){
-					//gas servo closed
-					//electric throttle off
-					//regen off
+					
+					throttle_pos = ThrottleCalc(0); //gas servo closed
+					bitunset(5, &digital_out1); //electric throttle off
+					bitunset(6, &digital_out1); //regen most DEFINITELY off
 					//FAULT
 				}
 		}else{	//Our hybrid math goes here
