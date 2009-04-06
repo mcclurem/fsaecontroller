@@ -69,7 +69,7 @@ double Table::lookup(double value_x, double value_y)
 			index_y2 = length_y - 1;
 
 
-		printf("\n\n\nIndex a1 = %d, Index b1 = %d\n", index_x1, index_y1);
+//		printf("\n\n\nIndex a1 = %d, Index b1 = %d\n", index_x1, index_y1);
 
 		double value_x0y0 = values[index_x1][index_y1];
 		double value_x0y1 = values[index_x1][index_y2];
@@ -85,17 +85,15 @@ double Table::lookup(double value_x, double value_y)
 		double x = 1.- (((double)(index_x2)*delta_x - value_x)/delta_x);
 		double y = 1.- (((double)(index_y2)*delta_y - value_y)/delta_y);
 
-		printf("X=%lf, Y=%lf\n",x,y);
+//		printf("X=%lf, Y=%lf\n",x,y);
 		point interpoint, point1, point2, point3;
 		if( y <= x )
 		{//upper right
-			printf("UR\n");
 			point1.x = 1.;
 			point1.y = 0.;
 			point1.z = value_x1y0;
 		}else
 		{//lower left
-			printf("LL\n");
 			point1.x = 0.;
 			point1.y = 1.;
 			point1.z = value_x0y1;
@@ -103,13 +101,11 @@ double Table::lookup(double value_x, double value_y)
 		
 		if( y <= (-x + 1) )
 		{//upper left
-			printf("UL\n");
 			point2.x = 0.;
 			point2.y = 0.;
 			point2.z = value_x0y0;
 		}else
 		{//lower right
-			printf("LR\n");
 			point2.x = 1.;
 			point2.y = 1.;
 			point2.z = value_x1y1;
@@ -123,7 +119,7 @@ double Table::lookup(double value_x, double value_y)
 		interpoint.y = y;
 
 
-		printf("point 1=%lf, point2=%lf 2midval = %lf\n", point1.z, point2.z, midval);
+//		printf("point 1=%lf, point2=%lf 2midval = %lf\n", point1.z, point2.z, midval);
 		//Calculate determinants
 		double A,B,C,D;
 		A = (point1.y * (point2.z - point3.z)) + (point2.y * (point3.z - point1.z)) + (point3.y * (point1.z - point2.z));
@@ -133,21 +129,16 @@ double Table::lookup(double value_x, double value_y)
 			+ (point2.x * (point3.y * point1.z - point1.y * point3.z))
 			+ (point3.x * (point1.y * point2.z - point2.y * point1.z));
 
-		printf("A=%lf, B=%lf, C=%lf, D=%lf\n",A,B,C,D);
+//		printf("A=%lf, B=%lf, C=%lf, D=%lf\n",A,B,C,D);
 		interpoint.z = ( D - ( interpoint.x * A )-( interpoint.y * B))/C;
 
+		if( interpoint.z < point1.z && interpoint.z < point2.z && interpoint.z < point3.z )
+				printf("\n\n\n\nSHITSHITSHITSHIT - UNDERFLOW\n\n\n\n");
 
+		if( interpoint.z > point1.z && interpoint.z > point2.z && interpoint.z > point3.z )
+				printf("\n\n\n\nSHITSHITSHITSHIT - OVERFLOW\n\n\n\n");
 
-
-
-
-
-
-
-
-
-
-		printf("%lf\t%lf\n%lf\t%lf\n", value_x0y0, value_x1y0, value_x0y1, value_x1y1);
+//		printf("%lf\t%lf\n%lf\t%lf\n", value_x0y0, value_x1y0, value_x0y1, value_x1y1);
 		
 		return interpoint.z;
 }
