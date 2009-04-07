@@ -1,4 +1,7 @@
 
+#include "definitions.h"
+#include "vcmdas.h"
+#include "python_io.h"
 
 class Car
 {

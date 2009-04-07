@@ -203,7 +203,7 @@ void PythonIO::initPWM()
 //Now we set the PWM duty-cycle
 		outb(DUTY_CYCLE1, rHWMoniterIndex);	//Chose the first pwm duty-cycle register
 //***********************************************************
-		outb(0x80, rHWMoniterData);			// we need to fix this value, it affects the position that the PWM is 
+		outb(0x22, rHWMoniterData);			// we need to fix this value, it affects the position that the PWM is 
 										//initialized at (ie the initial servo position)
 //***********************************************************
 //Done setting duty-cycle
