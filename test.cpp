@@ -4,6 +4,11 @@
 #include "python_io.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+/** This is a little test program that is for testing loop
+ * closure time on our I/O querying and writing
+ */
+
 int main()
 {
 	unsigned char foo = 0xF0;
