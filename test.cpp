@@ -30,7 +30,7 @@ int main()
 		for(unsigned char i=0; i<4; i++)
 			unsigned char crap = board->getDigital(i);
 
-		for(unsigned char i=0; i<8; i++)
+		for(unsigned char i=0; i<4; i++)
 			unsigned short crap = board->getAnalog(i);
 
 		board->setPWMDuty(22);

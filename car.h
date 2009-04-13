@@ -7,9 +7,21 @@ class Car
 {
 	public:
 		Car();
+		void run();
 	private:
+
+		void gasLoop();
+		void electricLoop();
+		void hybridLoop();
+
+		void inputQuery();
+		void writeOutputs();
+		
 		VCMDAS das;
 		PythonIO board;
+
+		Table gasMap;
+		Table electricMap;
 
 		unsigned char digIn1;
 		unsigned char digIn2;
@@ -17,6 +29,11 @@ class Car
 		unsigned char digOut2;
 		unsigned char capWarn;
 		unsigned char capStop;
+		unsigned char throttleOutPrevious;
+		unsigned char throttleOut;
+
+		float electricRegenPercentage;
+		float electricThrottlePercentage;
 
 		float pedalPosition;
 		float brakePosition;
@@ -36,6 +53,5 @@ class Car
 		float rearLeftRPM;
 		float rearRightRPM;
 		float engineRPM;
-
 
 };

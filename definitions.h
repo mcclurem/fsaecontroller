@@ -65,6 +65,10 @@ union word{
 
 #endif
 
+//**************Analog Outs(VCMDAS)***************
+//00 = Electric Throttle
+//01 = Electric Regen
+//
 //**************Analog Ins(VCMDAS)***************
 //00 = Gas pedal
 //01 = Brake pedal
