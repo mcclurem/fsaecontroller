@@ -4,11 +4,15 @@
 #include "vcmdas.h"
 #include "python_io.h"
 
+
+
 class Car
 {
 	public:
 		Car();
 		void run();
+
+	enum modeType { HYBRID, GAS, ELECTRIC, FAULT };
 	private:
 
 		void gasLoop();
@@ -19,12 +23,14 @@ class Car
 		void writeOutputs();
 
 		inline void fanHandler();
+		inline void shiftHandler();
+		inline void ensureNeutral();
 		
 		VCMDAS * das;
 		PythonIO * board;
 
-		Table gasMap;
-		Table electricMap;
+		//Table gasMap;
+		//Table electricMap;
 
 		unsigned char digIn1;
 		unsigned char digIn2;
@@ -34,6 +40,8 @@ class Car
 		unsigned char capStop;
 		unsigned char throttleOutPrevious;
 		unsigned char throttleOut;
+
+		modeType mode;
 
 		float electricRegenPercentage;
 		float electricThrottlePercentage;

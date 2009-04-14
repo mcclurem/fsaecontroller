@@ -29,8 +29,62 @@ Car::Car()
 
 void Car::run()
 {
+	inputQuery();
 	do
 	{
+		//Hybrid
+		if(bitof(0, digIn1) && bitof(1, digIn1))
+		{
+			//need to set some state variables
+			if( mode != HYBRID )
+			{
+
+					mode = HYBRID;
+
+			}
+				hybridLoop();
+		}
+		
+		//Gas
+		if(bitof(0, digIn1) && !bitof(1, digIn1))
+		{
+			//need to set some state variables
+			if( mode != GAS )
+			{
+
+					mode = GAS;
+			}
+			gasLoop();
+
+		}
+		
+		//Electric
+		if(!bitof(0, digIn1) && bitof(1, digIn1))
+		{
+			//need to set some state variables
+			if( mode != ELECTRIC )
+			{
+					bitset(3, &digOut2); //Bank-Enable
+					bitunset(4, &digOut2); //Fans off
+					bitunset(5, &digOut2); //Fuel off
+					bitunset(6, &digOut2); //Ignition off
+
+					mode = ELECTRIC;
+			}
+			electricLoop();
+		}
+
+		//FAULT
+		if(!bitof(0,digIn1) && !bitof(1, digIn1))
+		{
+			//need to set some state variables
+			if( mode != FAULT )
+			{
+
+					mode = FAULT;
+			}
+
+		}
 	}while(true);
 }
 
@@ -40,14 +94,39 @@ void Car::gasLoop()
 {
 	inputQuery();
 
+
 //Before setting new throttle output, store previous value for hysterisis
 	throttleOutPrevious = throttleOut;
 	throttleOut = ThrottleCalc(pedalPosition);
 
-//Fans = with some hysterisis
+//Fans with some hysterisis
 	fanHandler();
+//Handle shifting
+	shiftHandler();
 
 	writeOutputs();
+
+//If tach is less than 500RPM then engine is not running
+//This block is a very simple starting routine, setting this particular
+//RPM value accurately is going to be important
+	if( engineRPM < 500. )
+	{
+		ensureNeutral();
+		//very simpler starting routine
+		if( bitof(2, digIn1) ) //Is the starter being pressed?
+		{
+			bitset(7, &digOut2); //Starter relay on
+		}else
+		{
+			bitset(4, &digOut1); // throw up a fault LED
+			return;
+		}
+	}else
+	{
+		bitunset(7, &digOut2); //Starter relay off
+	}
+
+
 }
 
 
@@ -138,5 +217,79 @@ inline void Car::fanHandler()
 
 inline void Car::shiftHandler()
 {
+	//upshift routine
+		if(bitof(5, digIn1))
+		{
+		//Clutch
+			bitset(0, &digOut2); //Clutch on
+			board->setDigital(2, digOut2); //Trigger it
+			usleep(10000); //10Msec sleep to allow clutch to pop
+		//Shift
+			bitset(1, &digOut2); //We throw the up shift
+			board->setDigital(2, digOut2); //Trigger it
+			usleep(10000); // 10Msec sleep to allow shift to occur
+		//Release
+			bitunset(1, &digOut2); //Now we release the shift
+			board->setDigital(2, digOut2); //Trigger it
+			usleep(10000); // 10Msec sleep to allow shifter to rebound
+
+			bitunset(0, &digOut2); //Clutch release
+		}	
+
+
+	//downshift routine
+		if(bitof(6, digIn1))
+		{
+		//Clutch
+			bitset(0, &digOut2); //Clutch on
+			board->setDigital(2, digOut2); //Trigger it
+			usleep(10000); //10Msec sleep to allow clutch to pop
+		//Shift
+			bitset(2, &digOut2); //We throw the down shift
+			board->setDigital(2, digOut2); //Trigger it
+			usleep(10000); // 10Msec sleep to allow shifter to occur
+		//Release
+			bitunset(2, &digOut2); //Now we release the shift
+			board->setDigital(2, digOut2); //Trigger it
+			usleep(10000); // 10Msec sleep to allow shifter to rebound
+
+			bitunset(0, &digOut2); //Clutch release
+		}
+
+
+	//Manual clutch routine
+		if(bitof(7, digIn1))
+			bitset(0, &digOut2);
+		else
+			bitunset(0, &digOut2);
 
 }
+
+
+/******Super Safe Neutral Finding Routine******/
+inline void Car::ensureNeutral()
+{
+	do
+	{
+		if( bitof(4, digIn2) ) //Neutral Indicator
+				break;
+	//Clutch
+		bitset(0, &digOut2); //Clutch on
+		board->setDigital(2, digOut2); //Trigger it
+		usleep(500000); // 1/2 sec sleep to allow clutch to pop
+	//Shift
+		bitset(2, &digOut2); //We throw the down shift
+		board->setDigital(2, digOut2); //Trigger it
+		usleep(500000); // 1/2 sec sleep to allow shift to occur
+	//Release
+		bitunset(2, &digOut2); //Now we release the shift
+		board->setDigital(2, digOut2); //Trigger it
+		usleep(500000); // 1/2 sec sleep to allow shift to rebound
+
+	}while(true);
+
+//Clutch Release
+	bitunset(0, &digOut2); //Clutch release
+	board->setDigital(2, digOut2); //Trigger it
+}
+

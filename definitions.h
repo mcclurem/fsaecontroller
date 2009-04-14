@@ -36,7 +36,7 @@
 #ifndef WORDTYPE
 #define WORDTYPE
 
-inline unsigned short bitof(unsigned char _bit_number, unsigned short _data)
+inline bool bitof(unsigned char _bit_number, unsigned short _data)
 {
 	return ((_data >> _bit_number) & 0x01);
 };
@@ -79,7 +79,7 @@ union word{
 //06 = Cap 0 temp
 //07 = Cap 1 temp
 //08 = Cap 2 temp
-//09 = cap 3 temp
+//09 = Cap 3 temp
 //10 = Cap 4 temp
 //11 = Cap 5 temp
 //12 = Front Left RPM
@@ -107,5 +107,5 @@ union word{
 //OUT			  16   |   17     |    18      |    19   |    20   |    21   |   22   |   23
 ///Function		Clutch | Shift-up | Shift-down | Bank-en | Fans-en | Fuel-en | ign-en | Starter
 //
-//IN			  24   |      25      |     26     |  27  |  28  |  29  |  30  |  31
-//Function		E-stop | Oil Pressure | Boot-Linux | Free | Free | Free | Free | Free
+//IN			  24   |      25      |     26     |    27   |  28  |  29  |  30  |  31
+//Function		E-stop | Oil Pressure | Boot-Linux | Neutral | Free | Free | Free | Free
