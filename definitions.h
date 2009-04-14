@@ -74,7 +74,7 @@ union word{
 //01 = Brake pedal
 //02 = Water temp
 //03 = TPS
-//04 = Wheel Speed Sensor
+//04 = Bank Voltage
 //05 = Gas Pressure
 //06 = Cap 0 temp
 //07 = Cap 1 temp
@@ -82,10 +82,10 @@ union word{
 //09 = cap 3 temp
 //10 = Cap 4 temp
 //11 = Cap 5 temp
-//12 = Cap 6 temp
-//13 = Bank Voltage
-//14 =
-//15 =
+//12 = Front Left RPM
+//13 = Front Right RPM
+//14 = Rear Left RPM
+//15 = Rear Right RPM
 //
 //*************Digital Ins(VCMDAS)**************
 //00-06 = Cap 0-6 Warn Signal

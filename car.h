@@ -1,5 +1,6 @@
 
 #include "definitions.h"
+#include "table.h"
 #include "vcmdas.h"
 #include "python_io.h"
 
@@ -16,9 +17,11 @@ class Car
 
 		void inputQuery();
 		void writeOutputs();
+
+		inline void fanHandler();
 		
-		VCMDAS das;
-		PythonIO board;
+		VCMDAS * das;
+		PythonIO * board;
 
 		Table gasMap;
 		Table electricMap;
@@ -37,7 +40,7 @@ class Car
 
 		float pedalPosition;
 		float brakePosition;
-		float engineTemp;
+		float waterTemp;
 		float bankVoltage;
 		float throttlePosition;
 		float shiftPressure;

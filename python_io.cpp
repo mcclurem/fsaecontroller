@@ -237,10 +237,8 @@ int PythonIO::getTach(int _chip)
 {
 	//LSB = 0x28, MSB = 0x29 ; + chip*2
 		word foo;
-		//outb(TACH_1_LSB, rHWMoniterIndex);  OLD VERSION
 		outb((0x28 + _chip * 2), rHWMoniterIndex); 
 		foo.lsb = inb(rHWMoniterData);
-		//outb(TACH_1_MSB, rHWMoniterIndex); OLD VERSION
 		outb((0x29 + _chip * 2), rHWMoniterIndex);
 		foo.msb = inb(rHWMoniterData);
 
