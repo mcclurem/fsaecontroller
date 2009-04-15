@@ -30,8 +30,8 @@ class Car
 		VCMDAS * das;
 		PythonIO * board;
 
-		//Table gasMap;
-		//Table electricMap;
+		Table *gasMap;
+		Table *electricMap;
 
 		unsigned char digIn1;
 		unsigned char digIn2;

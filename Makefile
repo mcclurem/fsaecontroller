@@ -21,7 +21,8 @@ pwmset: pwmset.cpp
 
 pwmloop: pwmloop.cpp
 		g++ -static pwmloop.cpp python_io.cpp vcmdas.cpp -o pwmloop
-
+tabletest: tabletest.cpp
+		g++ -static tabletest.cpp table.cpp -o tabletest
 permissions:
 		chown root:root main
 		chmod +s main
