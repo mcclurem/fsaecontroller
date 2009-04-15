@@ -101,8 +101,8 @@ union word{
 //IN			     0     |     1       |   2   |  3  |  4  |    5     |    6       |    7
 //Function		Gas-Enable | Elec-Enable | Start | SW1 | SW2 | Shift-Up | Shift-Down | Clutch
 //
-//OUT			 8   |  9   |  10  |  11  |  12  |    13    |    14     |   15
-//Function		LED1 | LED2 | LED3 | LED4 | LED5 | Throt-EN | Brake-EN  |
+//OUT			 8   |  9   |  10  |  11  |  12  |    13    |    14     |         15
+//Function		LED1 | LED2 | LED3 | LED4 | LED5 | Throt-EN | Brake-EN  | Motor Controller-EN
 //
 //OUT			  16   |   17     |    18      |    19   |    20   |    21   |   22   |   23
 ///Function		Clutch | Shift-up | Shift-down | Bank-en | Fans-en | Fuel-en | ign-en | Starter

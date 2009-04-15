@@ -2,18 +2,6 @@
 #include "car.h"
 
 
-inline unsigned char ThrottleCalc(float percentage)
-{
-	const unsigned char max_duty = 40; // using this so that we can adjust our endpoints of servo travel
-	const unsigned char min_duty = 22;
-	unsigned char retval;
-	retval = (unsigned char)(((float)(max_duty - min_duty) * percentage) + (float)min_duty);
-	if(retval < min_duty)
-			retval = min_duty;
-	if(retval > max_duty)
-			retval = max_duty;
-	return retval;
-};
 
 Car::Car()
 {
@@ -21,7 +9,7 @@ Car::Car()
 		board = new PythonIO();
 		
 		das->setDigitalDirection(2, false);
-		board->setPWMDuty(ThrottleCalc(0.));
+		board->setPWMDuty(throttleCalc(0.));
 		board->initDigitalIO(0xFF0000FF);
 }
 
@@ -32,47 +20,63 @@ void Car::run()
 	inputQuery();
 	do
 	{
+		inputQuery();//Query the ins to simplify each loop
 		//Hybrid
-		if(bitof(0, digIn1) && bitof(1, digIn1))
+		if(bitof(0, digIn1) && bitof(1, digIn1) && !bitof(0, digIn2))
 		{
 			//need to set some state variables
 			if( mode != HYBRID )
 			{
-
-					mode = HYBRID;
-
+				bitset(7, &digOut1); //Motor Controller-Enable
+				bitset(3, &digOut2); //Bank-Enable
+				bitset(5, &digOut2); //Fuel-Enable
+				bitset(6, &digOut2); //Ignition-Enable
+				mode = HYBRID;
 			}
 				hybridLoop();
 		}
 		
+
+
 		//Gas
-		if(bitof(0, digIn1) && !bitof(1, digIn1))
+		if(bitof(0, digIn1) && !bitof(1, digIn1) && !bitof(0, digIn2))
 		{
 			//need to set some state variables
 			if( mode != GAS )
 			{
-
+				bitunset(7, &digOut1); //Motor Controller-Disable
+				bitunset(3, &digOut2); //Bank-Disable
+				bitset(5, &digOut2); //Fuel-Enable
+				bitset(6, &digOut2); //Ignition-Enable
 					mode = GAS;
 			}
 			gasLoop();
 
 		}
 		
+
+
 		//Electric
-		if(!bitof(0, digIn1) && bitof(1, digIn1))
+		if(!bitof(0, digIn1) && bitof(1, digIn1) && !bitof(0, digIn2))
 		{
 			//need to set some state variables
 			if( mode != ELECTRIC )
 			{
+					bitset(7, &digOut1); //Motor Controller-Enable
 					bitset(3, &digOut2); //Bank-Enable
 					bitunset(4, &digOut2); //Fans off
 					bitunset(5, &digOut2); //Fuel off
 					bitunset(6, &digOut2); //Ignition off
-
+			//Before setting new throttle output, store previous value for hysterisis
+					throttleOutPrevious = throttleOut;
+					throttleOut = throttleCalc(0.);
+			//Set the mode
 					mode = ELECTRIC;
 			}
 			electricLoop();
 		}
+
+
 
 		//FAULT
 		if(!bitof(0,digIn1) && !bitof(1, digIn1))
@@ -83,8 +87,10 @@ void Car::run()
 
 					mode = FAULT;
 			}
-
 		}
+
+
+		writeOutputs();
 	}while(true);
 }
 
@@ -92,19 +98,15 @@ void Car::run()
 
 void Car::gasLoop()
 {
-	inputQuery();
-
 
 //Before setting new throttle output, store previous value for hysterisis
 	throttleOutPrevious = throttleOut;
-	throttleOut = ThrottleCalc(pedalPosition);
+	throttleOut = throttleCalc(pedalPosition);
 
 //Fans with some hysterisis
 	fanHandler();
 //Handle shifting
 	shiftHandler();
-
-	writeOutputs();
 
 //If tach is less than 500RPM then engine is not running
 //This block is a very simple starting routine, setting this particular
@@ -132,6 +134,7 @@ void Car::gasLoop()
 
 void Car::electricLoop()
 {
+	
 }
 
 
@@ -217,9 +220,14 @@ inline void Car::fanHandler()
 
 inline void Car::shiftHandler()
 {
+//Because of the importance of avoiding false triggering,
+//we query the inputs again (note that this is done with
+//short-circuit so we aren't adding to runtime except
+//when necessary
 	//upshift routine
-		if(bitof(5, digIn1))
+		if(bitof(5, digIn1) && bitof(5, board->getDigital(0)))
 		{
+				
 		//Clutch
 			bitset(0, &digOut2); //Clutch on
 			board->setDigital(2, digOut2); //Trigger it
@@ -238,7 +246,7 @@ inline void Car::shiftHandler()
 
 
 	//downshift routine
-		if(bitof(6, digIn1))
+		if(bitof(6, digIn1) && bitof(6, board->getDigital(0)))
 		{
 		//Clutch
 			bitset(0, &digOut2); //Clutch on
@@ -258,7 +266,7 @@ inline void Car::shiftHandler()
 
 
 	//Manual clutch routine
-		if(bitof(7, digIn1))
+		if(bitof(7, digIn1) && bitof(7, board->getDigital(0)))
 			bitset(0, &digOut2);
 		else
 			bitunset(0, &digOut2);
@@ -269,14 +277,14 @@ inline void Car::shiftHandler()
 /******Super Safe Neutral Finding Routine******/
 inline void Car::ensureNeutral()
 {
+//Clutch
+	bitset(0, &digOut2); //Clutch on
+	board->setDigital(2, digOut2); //Trigger it
+	usleep(500000); // 1/2 sec sleep to allow clutch to pop
 	do
 	{
 		if( bitof(4, digIn2) ) //Neutral Indicator
 				break;
-	//Clutch
-		bitset(0, &digOut2); //Clutch on
-		board->setDigital(2, digOut2); //Trigger it
-		usleep(500000); // 1/2 sec sleep to allow clutch to pop
 	//Shift
 		bitset(2, &digOut2); //We throw the down shift
 		board->setDigital(2, digOut2); //Trigger it
@@ -293,3 +301,15 @@ inline void Car::ensureNeutral()
 	board->setDigital(2, digOut2); //Trigger it
 }
 
+inline unsigned char Car::throttleCalc(float percentage)
+{
+	const unsigned char max_duty = 40; // using this so that we can adjust our endpoints of servo travel
+	const unsigned char min_duty = 22;
+	unsigned char retval;
+	retval = (unsigned char)(((float)(max_duty - min_duty) * percentage) + (float)min_duty);
+	if(retval < min_duty)
+			retval = min_duty;
+	if(retval > max_duty)
+			retval = max_duty;
+	return retval;
+};
