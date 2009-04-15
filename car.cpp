@@ -102,13 +102,14 @@ void Car::run()
 			//need to set some state variables on first entry:
 			if( mode != FAULT )
 			{
-					FAN_OFF;
-					FUEL_OFF;
-					BANK_OFF;
-					MC_OFF;
-					IGN_OFF;
+				FAN_OFF;
+				FUEL_OFF;
+				BANK_OFF;
+				MC_OFF;
+				IGN_OFF;
+				throttleCalc(0.); //Close the throttle
 			//Set the Mode state variable
-					mode = FAULT;
+				mode = FAULT;
 			}
 		}
 
@@ -257,7 +258,7 @@ inline void Car::shiftHandler()
 {
 //Because of the importance of avoiding false triggering,
 //we query the inputs again (note that this is done with
-//short-circuit so we aren't adding to runtime except
+//short-circuiting so we aren't adding to runtime except
 //when necessary
 	//upshift routine
 		if(bitof(5, digIn1) && bitof(5, board->getDigital(0)))

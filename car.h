@@ -12,7 +12,7 @@ class Car
 		Car();
 		void run();
 
-	enum modeType { HYBRID, GAS, ELECTRIC, FAULT };
+		enum modeType { HYBRID, GAS, ELECTRIC, FAULT };
 	private:
 
 		void gasLoop();
