@@ -5,19 +5,19 @@ CXXFLAGS="-O1"
 all: binary dataparser 
 
 binary: python.o vcmdas.o table.o car.o
-	    g++ python.o vcmdas.o table.o car.o main.cpp -o main
+	    g++ -static python.o vcmdas.o table.o car.o main.cpp -o main
 
 dataparser:
-	    g++ dataparse.cpp -o dataparser
+	    g++ -static dataparse.cpp -o dataparser
 
 dascontrol: vcmdas.o
-		g++ dasmanipulator.cpp vcmdas.o -o dascontrol
+		g++ -static dasmanipulator.cpp vcmdas.o -o dascontrol
 
-pwmset:
-		g++ pwmset.cpp python_io.o -o pwmset
+pwmset: python.o
+		g++ -static pwmset.cpp python.o -o pwmset
 
 pwmloop: python.o
-		g++ -static pwmloop.cpp python_io.o vcmdas.o -o pwmloop
+		g++ -static pwmloop.cpp python.o vcmdas.o -o pwmloop
 
 tabletest: table.o
 		g++ -static tabletest.cpp table.cpp -o tabletest
@@ -26,13 +26,13 @@ python.o:
 		g++ -c python_io.cpp -o python.o
 
 vcmdas.o:
-		g++ -c vcmdas.cpp
+		g++ -c vcmdas.cpp -o vcmdas.o
 
 car.o:
-		g++ -c car.cpp
+		g++ -c car.cpp -o car.o
 
 table.o:
-		g++ -c table.cpp
+		g++ -c table.cpp -o table.o
 
 permissions:
 		chown root:root main
