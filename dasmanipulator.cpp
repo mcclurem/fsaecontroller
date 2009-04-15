@@ -9,7 +9,7 @@ int main(){
 	char function [50];
 	int arg1;
 	int arg2;
-	VCMDAS* das = new VCMDAS(0x0300,0x0000);
+	VCMDAS* das = new VCMDAS();
 	das->enableEEPROMWrite();
 	
 	do{
