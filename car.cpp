@@ -9,7 +9,8 @@ Car::Car()
 		board = new PythonIO();
 		
 		das->setDigitalDirection(2, false);
-		board->setPWMDuty(throttleCalc(0.));
+		throttleCalc(0.);
+		board->setPWMDuty(throttleOut);
 		board->initDigitalIO(0xFF0000FF);
 }
 
@@ -67,9 +68,7 @@ void Car::run()
 					bitunset(4, &digOut2); //Fans off
 					bitunset(5, &digOut2); //Fuel off
 					bitunset(6, &digOut2); //Ignition off
-			//Before setting new throttle output, store previous value for hysterisis
-					throttleOutPrevious = throttleOut;
-					throttleOut = throttleCalc(0.);
+					throttleCalc(0.); //Close the throttle
 			//Set the mode
 					mode = ELECTRIC;
 			}
@@ -99,9 +98,7 @@ void Car::run()
 void Car::gasLoop()
 {
 
-//Before setting new throttle output, store previous value for hysterisis
-	throttleOutPrevious = throttleOut;
-	throttleOut = throttleCalc(pedalPosition);
+	throttleCalc(pedalPosition);
 
 //Fans with some hysterisis
 	fanHandler();
@@ -301,15 +298,17 @@ inline void Car::ensureNeutral()
 	board->setDigital(2, digOut2); //Trigger it
 }
 
-inline unsigned char Car::throttleCalc(float percentage)
+inline void Car::throttleCalc(float percentage)
 {
+//Before setting new throttle output, store previous value for hysterisis
+	throttleOutPrevious = throttleOut;
+
 	const unsigned char max_duty = 40; // using this so that we can adjust our endpoints of servo travel
 	const unsigned char min_duty = 22;
-	unsigned char retval;
-	retval = (unsigned char)(((float)(max_duty - min_duty) * percentage) + (float)min_duty);
-	if(retval < min_duty)
-			retval = min_duty;
-	if(retval > max_duty)
-			retval = max_duty;
-	return retval;
-};
+	throttleOut = (unsigned char)(((float)(max_duty - min_duty) * percentage) + (float)min_duty);
+	if(throttleOut < min_duty)
+			throttleOut = min_duty;
+	if(throttleOut > max_duty)
+			throttleOut = max_duty;
+}
+

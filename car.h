@@ -25,7 +25,7 @@ class Car
 		inline void fanHandler();
 		inline void shiftHandler();
 		inline void ensureNeutral();
-		inline unsigned char throttleCalc(float percentage);
+		inline void throttleCalc(float percentage);
 		
 		VCMDAS * das;
 		PythonIO * board;

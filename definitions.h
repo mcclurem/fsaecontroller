@@ -39,21 +39,21 @@
 inline bool bitof(unsigned char _bit_number, unsigned short _data)
 {
 	return ((_data >> _bit_number) & 0x01);
-};
+}
 
 inline void bitset(unsigned char bit, unsigned char* byte)
 {
 		if( bit > 7 )
 				return;
 		*byte |= (0x01 << bit);
-};
+}
 
 inline void bitunset(unsigned char bit, unsigned char* byte)
 {
 		if( bit > 7 )
 				return;
 		*byte &= (~(0x01 << bit));
-};
+}
 
 union word{
 		struct {
