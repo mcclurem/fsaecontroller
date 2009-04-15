@@ -41,47 +41,35 @@ void Car::run()
 	do
 	{
 		inputQuery();//Query the ins to simplify each loop
+		
 		//Hybrid
-		//if(bitof(0, digIn1) && bitof(1, digIn1) && !bitof(0, digIn2))
 		if(GAS_SWITCH && ELECTRIC_SWITCH && !ESTOP)
 		{
-			//need to set some state variables
+			//need to set some state variables on first entry:
 			if( mode != HYBRID )
 			{
-/*
-				bitset(7, &digOut1); //Motor Controller-Enable
-				bitset(3, &digOut2); //Bank-Enable
-				bitset(5, &digOut2); //Fuel-Enable
-				bitset(6, &digOut2); //Ignition-Enable
-				*/
 				MC_ON;
 				BANK_ON;
 				FUEL_ON;
 				IGN_ON;
+			//Set the Mode state variable
 				mode = HYBRID;
 			}
 				hybridLoop();
 		}
-		
 
 
 		//Gas
 		if(GAS_SWITCH && !ELECTRIC_SWITCH && !ESTOP)
 		{
-			//need to set some state variables
+			//need to set some state variables on first entry:
 			if( mode != GAS )
 			{
-				/*
-				bitunset(7, &digOut1); //Motor Controller-Disable
-				bitunset(3, &digOut2); //Bank-Disable
-				bitset(5, &digOut2); //Fuel-Enable
-				bitset(6, &digOut2); //Ignition-Enable
-				*/
 				MC_OFF;
 				BANK_OFF;
 				FUEL_ON;
 				IGN_ON;
-
+			//Set the Mode state variable
 				mode = GAS;
 			}
 			gasLoop();
@@ -89,52 +77,37 @@ void Car::run()
 		}
 		
 
-
 		//Electric
 		if(!GAS_SWITCH && ELECTRIC_SWITCH && !ESTOP)
 		{
-			//need to set some state variables
+			//need to set some state variables on first entry:
 			if( mode != ELECTRIC )
 			{
-				/*
-					bitset(7, &digOut1); //Motor Controller-Enable
-					bitset(3, &digOut2); //Bank-Enable
-					bitunset(4, &digOut2); //Fans off
-					bitunset(5, &digOut2); //Fuel off
-					bitunset(6, &digOut2); //Ignition off
-				*/
-					MC_ON;
-					BANK_ON;
-					FUEL_OFF;
-					IGN_OFF;
-					FAN_OFF;
-					throttleCalc(0.); //Close the throttle
-			//Set the mode
-					mode = ELECTRIC;
+				MC_ON;
+				BANK_ON;
+				FUEL_OFF;
+				IGN_OFF;
+				FAN_OFF;
+				throttleCalc(0.); //Close the throttle
+			//Set the Mode state variable
+				mode = ELECTRIC;
 			}
 			electricLoop();
 		}
 
 
-
 		//FAULT
 		if(!bitof(0,digIn1) && !bitof(1, digIn1))
 		{
-			//need to set some state variables
+			//need to set some state variables on first entry:
 			if( mode != FAULT )
 			{
-				/*
-					bitunset(7, &digOut1); //Motor Controller-Enable
-					bitunset(3, &digOut2); //Bank-Enable
-					bitunset(4, &digOut2); //Fans off
-					bitunset(5, &digOut2); //Fuel off
-					bitunset(6, &digOut2); //Ignition off
-					*/
 					FAN_OFF;
 					FUEL_OFF;
 					BANK_OFF;
 					MC_OFF;
 					IGN_OFF;
+			//Set the Mode state variable
 					mode = FAULT;
 			}
 		}
