@@ -131,7 +131,20 @@ void Car::gasLoop()
 
 void Car::electricLoop()
 {
-	
+	shiftHandler();
+	if(brakePosition < 0.05)
+	{
+		electricThrottlePercentage = pedalPosition;
+		electricRegenPercentage = 0.;
+		bitset(5, &digOut1); //ThrottleEnable
+		bitunset(6, &digOut1); //Regen Disable
+	}else
+	{
+		electricThrottlePercentage = 0.;
+		electricRegenPercentage = brakePosition;
+		bitunset(5, &digOut1); //ThrottleDisable
+		bitset(6, &digOut1); //Regen Enable
+	}
 }
 
 
