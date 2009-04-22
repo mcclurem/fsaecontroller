@@ -22,6 +22,7 @@ class Car
 		void inputQuery();
 		void writeOutputs();
 
+		void startGas();
 		inline void fanHandler();
 		inline void shiftHandler();
 		inline void ensureNeutral();
@@ -65,5 +66,9 @@ class Car
 		float rearLeftRPM;
 		float rearRightRPM;
 		float engineRPM;
+
+	//Two state variables used to prevent accidental double shifts
+		bool upshifted;
+		bool downshifted;
 
 };
