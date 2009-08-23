@@ -7,6 +7,10 @@ all: binary dataparser
 binary: python.o vcmdas.o table.o car.o
 	    g++ -static python.o vcmdas.o table.o car.o main.cpp -o main
 
+inputtest: python.o vcmdas.o
+		g++ -static python.o vcmdas.o inputtest.cpp
+
+
 dataparser:
 	    g++ -static dataparse.cpp -o dataparser
 
