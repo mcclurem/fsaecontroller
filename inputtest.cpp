@@ -38,38 +38,39 @@ int main()
 			byte1 = tmp1;
 			byte2 = tmp2;
 			byte3 = tmp3;
-			for (int i=0; i != 8; i++){
+			int i;
+			for (i=0; i != 8; i++){
 				if(bitof(i, byte0))
 					printf("1");
 				else
 					printf("0");
 			}
-			printf(" ")
-			for (int i=0; i != 8; i++){
+			printf(" ");
+			for (i=0; i != 8; i++){
 				if(bitof(i, byte1))
 					printf("1");
 				else
 					printf("0");
 			}
-			printf(" ")
-			for (int i=0; i != 8; i++){
+			printf(" ");
+			for (i=0; i != 8; i++){
 				if(bitof(i, byte2))
 					printf("1");
 				else
 					printf("0");
 			}
-			printf(" ")
-			for (int i=0; i != 8; i++){
+			printf(" ");
+			for (i=0; i != 8; i++){
 				if(bitof(i, byte3))
 					printf("1");
 				else
 					printf("0");
 			}
-			printf("\n")
+			printf("\n");
 		}
 			//printf("%c %c %c %c", byte0, byte1, byte2, byte3);
 
-	}while(true)
+	}while(true);
 
 	return 0;
 };
