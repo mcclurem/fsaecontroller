@@ -21,6 +21,10 @@ class PythonIO
 		 * @param _data Value to write to the byte
 		 */
 		void setDigital(char io_byte, unsigned char _data);
+		/**
+		 * Function to initialize the direction of the digital IO ports
+		 * @param direction unsigned int where a bit that is set indicates and input
+		 */
 		void initDigitalIO(unsigned int direction);
 		void initPWM();
 		/**
