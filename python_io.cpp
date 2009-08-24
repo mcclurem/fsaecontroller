@@ -38,9 +38,9 @@ unsigned char PythonIO::getDigital(char io_byte)
 			gpio_address = 0x13; //GPIO bank A = 0x12
 
 		if(bitof(1, io_byte))
-			outb( 0x27, rSPIControl ); //Dig I/O chip 1 (see ref manual for bitwise breakdown)
+			outb( CHIP1, rSPIControl ); //Dig I/O chip 1 (see ref manual for bitwise breakdown)
 		else
-			outb( 0x26, rSPIControl ); //Dig I/O chip 0 (see ref manual for bitwise breakdown)
+			outb( CHIP0, rSPIControl ); //Dig I/O chip 0 (see ref manual for bitwise breakdown)
 
 		outb( 0x30, rSPIStatus ); //irq3, 8.3MHz, int disabled, shift Msb
 		outb( 0x00, rSPIData1 );	//We're not acctually writing anything to the bank so its irrellevant
@@ -65,14 +65,14 @@ void PythonIO::setDigital(char io_byte, unsigned char _data)
 
 
 		if(bitof(1, io_byte))
-			outb( 0x27, rSPIControl ); //Dig I/O chip 1 (see ref manual for bitwise breakdown)
+			outb( CHIP1, rSPIControl ); //Dig I/O chip 1 (see ref manual for bitwise breakdown)
 		else
-			outb( 0x26, rSPIControl ); //Dig I/O chip 0 (see ref manual for bitwise breakdown)
+			outb( CHIP0, rSPIControl ); //Dig I/O chip 0 (see ref manual for bitwise breakdown)
 		
 		outb( 0x30, rSPIStatus ); //irq3, 8.3MHz, int disabled, shift Msb
 		outb( _data, rSPIData1);			//Data to write to the bank
 		outb( gpio_address, rSPIData2);		//Choose the GPIO bank on the chip
-		outb( 0x40, rSPIData3);			//The R/W bit (bit 0) should be 0 == Write
+		outb( WRITECMD, rSPIData3);			//The R/W bit (bit 0) should be 0 == Write
 		waitOnTransaction();
 }
 
@@ -111,33 +111,33 @@ void PythonIO::initDigitalIO(unsigned int direction)
 	//SPIDATA3 = command byte - Which I'm guessing is allways 0x40
 	//Not sure what I believe, but we're going to use that assumption to clean up their code
 	//Initialize
-	outb( 0x26, rSPIControl );
+	outb( CHIP0, rSPIControl );
 	outb( 0x30, rSPIStatus );
 	outb( 0x44, rSPIData1 );	
-	outb( 0x0A, rSPIData2 );	
-	outb( 0x40, rSPIData3 );	
+	outb( IOCON, rSPIData2 );	
+	outb( WRITECMD, rSPIData3 );	
 	waitOnTransaction();
 	
-	outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
+	outb( CHIP0, rSPIControl );	//Chip-select first on-board Digital I/O
 	outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 	outb( 0xFF, rSPIData1 );
-	outb( 0x0C, rSPIData2 ); //GPPUA
-	outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
+	outb( GPPUA, rSPIData2 ); //GPPUA
+	outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 	waitOnTransaction();
 	
 	//Initialize
-	outb( 0x27, rSPIControl );
+	outb( CHIP1, rSPIControl );
 	outb( 0x30, rSPIStatus );
 	outb( 0x44, rSPIData1 );	
-	outb( 0x0A, rSPIData2 );	
-	outb( 0x40, rSPIData3 );
+	outb( IOCON, rSPIData2 );	
+	outb( WRITECMD, rSPIData3 );
 	waitOnTransaction();
 	
-	outb( 0x27, rSPIControl );	//Chip-select first on-board Digital I/O
+	outb( CHIP1, rSPIControl );	//Chip-select first on-board Digital I/O
 	outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 	outb( 0xFF, rSPIData1 );
-	outb( 0x0D, rSPIData2 ); //GPPUB
-	outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
+	outb( GPPUB, rSPIData2 ); //GPPUB
+	outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 	waitOnTransaction();
 	
 	
@@ -149,32 +149,32 @@ void PythonIO::initDigitalIO(unsigned int direction)
 
 	printf("DIR 0=%d, DIR 1=%d, DIR 2=%d, DIR 3=%d\n", byte0, byte1, byte2, byte3);
 
-		outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
+		outb( CHIP0, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte0, rSPIData1 );	//Set all 1's to set all to inputs
-		outb( 0x00, rSPIData2 );	//IODIRA register = 0x00
-		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
+		outb( IODIRA, rSPIData2 );	//IODIRA register = 0x00
+		outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 
-		outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
+		outb( CHIP0, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte1, rSPIData1 );	//Set all 1's to set all to inputs
-		outb( 0x01, rSPIData2 );	//IODIRB register = 0x01
-		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
+		outb( IODIRB, rSPIData2 );	//IODIRB register = 0x01
+		outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 	//We've now initialized the first chip
-		outb( 0x27, rSPIControl );	//Chip-select second on-board Digital I/O
+		outb( CHIP1, rSPIControl );	//Chip-select second on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte2, rSPIData1 );	//Set all 1's to set all to inputs
-		outb( 0x00, rSPIData2 );	//IODIRA register = 0x00
-		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
+		outb( IODIRA, rSPIData2 );	//IODIRA register = 0x00
+		outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 
-		outb( 0x27, rSPIControl );	//Chip-select second on-board Digital I/O
+		outb( CHIP1, rSPIControl );	//Chip-select second on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte3, rSPIData1 );	//Set all 1's to set all to inputs
-		outb( 0x01, rSPIData2 );	//IODIRB register = 0x01
-		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
+		outb( IODIRB, rSPIData2 );	//IODIRB register = 0x01
+		outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 	//We've now initialized the second chip to all inputs
 
@@ -183,7 +183,7 @@ void PythonIO::initDigitalIO(unsigned int direction)
 /*
 void PythonIO::setPullup(bool enable)
 {
-	outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
+	outb( CHIP0, rSPIControl );	//Chip-select first on-board Digital I/O
 	outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 	outb( 0x
 }

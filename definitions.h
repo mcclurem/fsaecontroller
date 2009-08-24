@@ -33,6 +33,20 @@
 
 #endif
 
+#ifndef IOCHIP_REGS
+#define IOCHIP_REGS
+	#define GPPUA		0x0C
+	#define GPPUB		0x0D
+	#define IOCON		0x0A
+	#define CHIP0		0x26
+	#define CHIP1		0x27
+	#define WRITECMD	0x40
+	#define IODIRA		0x00
+	#define IODIRB		0x01
+#endif
+
+
+
 #ifndef WORDTYPE
 #define WORDTYPE
 
