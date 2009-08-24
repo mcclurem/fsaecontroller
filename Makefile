@@ -20,7 +20,7 @@ dascontrol: vcmdas.o
 pwmset: python.o
 		g++ -static pwmset.cpp python.o -o pwmset
 
-pwmloop: python.o
+pwmloop: python.o vcmdas.o
 		g++ -static pwmloop.cpp python.o vcmdas.o -o pwmloop
 
 tabletest: table.o
@@ -43,4 +43,4 @@ permissions:
 		chmod +s main
 
 clean:
-	    rm -rf *o *.gch main dataparser
+	    rm -rf *o *.gch main dataparser inputtest dascontrol pwmloop pwmset tabletest
