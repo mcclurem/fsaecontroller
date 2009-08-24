@@ -110,6 +110,13 @@ void PythonIO::initDigitalIO(unsigned int direction)
 	//SPIDATA2 = Address Byte
 	//SPIDATA3 = command byte - Which I'm guessing is allways 0x40
 	//Not sure what I believe, but we're going to use that assumption to clean up their code
+	//Initialize
+	outb( 0x26, rSPIControl );
+	outb( 0x30, rSPIStatus );
+	outb( 0x44, rSPIData1 );	
+	outb( 0x0A, rSPIData2 );	
+	outb( 0x40, rSPIData3 );	
+	waitOnTransaction();
 	
 	outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
 	outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
@@ -118,7 +125,15 @@ void PythonIO::initDigitalIO(unsigned int direction)
 	outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 	waitOnTransaction();
 	
-	outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
+	//Initialize
+	outb( 0x27, rSPIControl );
+	outb( 0x30, rSPIStatus );
+	outb( 0x44, rSPIData1 );	
+	outb( 0x0A, rSPIData2 );	
+	outb( 0x40, rSPIData3 );
+	waitOnTransaction();
+	
+	outb( 0x27, rSPIControl );	//Chip-select first on-board Digital I/O
 	outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 	outb( 0xFF, rSPIData1 );
 	outb( 0x0D, rSPIData2 ); //GPPUB
@@ -133,6 +148,7 @@ void PythonIO::initDigitalIO(unsigned int direction)
 	byte3 = (direction & 0xFF000000) >> 24;
 
 	printf("DIR 0=%d, DIR 1=%d, DIR 2=%d, DIR 3=%d\n", byte0, byte1, byte2, byte3);
+
 		outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte0, rSPIData1 );	//Set all 1's to set all to inputs
@@ -143,7 +159,7 @@ void PythonIO::initDigitalIO(unsigned int direction)
 		outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte1, rSPIData1 );	//Set all 1's to set all to inputs
-		outb( 0x10, rSPIData2 );	//IODIRB register = 0x10
+		outb( 0x01, rSPIData2 );	//IODIRB register = 0x01
 		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 	//We've now initialized the first chip
