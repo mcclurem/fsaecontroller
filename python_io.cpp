@@ -136,25 +136,25 @@ void PythonIO::initDigitalIO(unsigned int direction)
 		outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte0, rSPIData1 );	//Set all 1's to set all to inputs
-		outb( 0x01, rSPIData2 );	//IODIRA register = 0x00
+		outb( 0x00, rSPIData2 );	//IODIRA register = 0x00
 		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 
 		outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte1, rSPIData1 );	//Set all 1's to set all to inputs
-		outb( 0x00, rSPIData2 );	//IODIRB register = 0x01
+		outb( 0x10, rSPIData2 );	//IODIRB register = 0x10
 		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
-	//We've now initialized the first chip to all inputs
-		outb( 0x27, rSPIControl );	//Chip-select first on-board Digital I/O
+	//We've now initialized the first chip
+		outb( 0x27, rSPIControl );	//Chip-select second on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte2, rSPIData1 );	//Set all 1's to set all to inputs
 		outb( 0x00, rSPIData2 );	//IODIRA register = 0x00
 		outb( 0x40, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 
-		outb( 0x27, rSPIControl );	//Chip-select first on-board Digital I/O
+		outb( 0x27, rSPIControl );	//Chip-select second on-board Digital I/O
 		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte3, rSPIData1 );	//Set all 1's to set all to inputs
 		outb( 0x01, rSPIData2 );	//IODIRB register = 0x01
@@ -164,9 +164,14 @@ void PythonIO::initDigitalIO(unsigned int direction)
 
 
 }
-
-
-
+/*
+void PythonIO::setPullup(bool enable)
+{
+	outb( 0x26, rSPIControl );	//Chip-select first on-board Digital I/O
+	outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+	outb( 0x
+}
+*/
 void PythonIO::initPWM()
 {
 		//ioperm only gives access to ports upto 0x3FF anything higher and we need to use iopl()
