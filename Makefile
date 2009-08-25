@@ -10,6 +10,9 @@ binary: python.o vcmdas.o table.o car.o
 inputtest: python.o vcmdas.o
 		g++ -static python.o vcmdas.o inputtest.cpp -o inputtest
 
+outputtest: python.o vcmdas.o
+		g++ -static python.o vcmdas.o outputtest.cpp -o outputtest
+
 
 dataparser:
 	    g++ -static dataparse.cpp -o dataparser
