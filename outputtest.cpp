@@ -31,10 +31,10 @@ int main()
 		board->setDigital(1, 0x00);
 		board->setDigital(2, 0xFF);
 		board->setDigital(3, 0x00);
-		board0 = board->getDigital(0);
-		board1 = board->getDigital(1);
-		board2 = board->getDigital(2);
-		board3 = board->getDigital(3);
+		byte0 = board->getDigital(0);
+		byte1 = board->getDigital(1);
+		byte2 = board->getDigital(2);
+		byte3 = board->getDigital(3);
 			int i;
 			for (i=0; i != 8; i++){
 				if(bitof(i, byte0))
