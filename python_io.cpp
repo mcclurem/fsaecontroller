@@ -42,7 +42,7 @@ unsigned char PythonIO::getDigital(char io_byte)
 		else
 			outb( CHIP0, rSPIControl ); //Dig I/O chip 0 (see ref manual for bitwise breakdown)
 
-		outb( 0x30, rSPIStatus ); //irq3, 8.3MHz, int disabled, shift Msb
+		outb( BUSCONFIG, rSPIStatus ); //irq3, 8.3MHz, int disabled, shift Msb
 		outb( 0x00, rSPIData1 );	//We're not acctually writing anything to the bank so its irrellevant
 		outb( gpio_address, rSPIData2 );	//Choose the GPIO bank on the chip
 		outb( 0x41, rSPIData3 );			//The R/W bit (bit 0) should be 1 == read
@@ -69,7 +69,7 @@ void PythonIO::setDigital(char io_byte, unsigned char _data)
 		else
 			outb( CHIP0, rSPIControl ); //Dig I/O chip 0 (see ref manual for bitwise breakdown)
 		
-		outb( 0x30, rSPIStatus ); //irq3, 8.3MHz, int disabled, shift Msb
+		outb( BUSCONFIG, rSPIStatus ); //irq3, 8.3MHz, int disabled, shift Msb
 		outb( _data, rSPIData1);			//Data to write to the bank
 		outb( gpio_address, rSPIData2);		//Choose the GPIO bank on the chip
 		outb( WRITECMD, rSPIData3);			//The R/W bit (bit 0) should be 0 == Write
@@ -87,7 +87,7 @@ unsigned short PythonIO::getAnalog(char io_pin)
 		io_pin = io_pin << 3;	//We bit shift it because it is supposed to write the address in pins 5-3
 		
 		outb( 0x35, rSPIControl ); //A/D chip select with 32bit frame for single sample,see ref manual
-		outb( 0x30, rSPIStatus ); //irq3, 8.3MHz, int disabled, shift Msb
+		outb( BUSCONFIG, rSPIStatus ); //irq3, 8.3MHz, int disabled, shift Msb
 		outb( 0x00, rSPIData2 );	//Unread data so value doesn't matter
 		outb(io_pin, rSPIData3);	//Initiate the transaction by writing the port value
 		waitOnTransaction();
@@ -112,29 +112,43 @@ void PythonIO::initDigitalIO(unsigned int direction)
 	//Not sure what I believe, but we're going to use that assumption to clean up their code
 	//Initialize
 	outb( CHIP0, rSPIControl );
-	outb( 0x30, rSPIStatus );
+	outb( BUSCONFIG, rSPIStatus );
 	outb( 0x44, rSPIData1 );	
 	outb( IOCON, rSPIData2 );	
 	outb( WRITECMD, rSPIData3 );	
 	waitOnTransaction();
 	
 	outb( CHIP0, rSPIControl );	//Chip-select first on-board Digital I/O
-	outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+	outb( BUSCONFIG, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 	outb( 0xFF, rSPIData1 );
 	outb( GPPUA, rSPIData2 ); //GPPUA
 	outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 	waitOnTransaction();
 	
+	outb( CHIP0, rSPIControl );	//Chip-select first on-board Digital I/O
+	outb( BUSCONFIG, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+	outb( 0xFF, rSPIData1 );
+	outb( GPPUB, rSPIData2 ); //GPPUB
+	outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
+	waitOnTransaction();
+	
 	//Initialize
 	outb( CHIP1, rSPIControl );
-	outb( 0x30, rSPIStatus );
+	outb( BUSCONFIG, rSPIStatus );
 	outb( 0x44, rSPIData1 );	
 	outb( IOCON, rSPIData2 );	
 	outb( WRITECMD, rSPIData3 );
 	waitOnTransaction();
 	
 	outb( CHIP1, rSPIControl );	//Chip-select first on-board Digital I/O
-	outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+	outb( BUSCONFIG, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+	outb( 0xFF, rSPIData1 );
+	outb( GPPUA, rSPIData2 ); //GPPUA
+	outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
+	waitOnTransaction();
+	
+	outb( CHIP1, rSPIControl );	//Chip-select first on-board Digital I/O
+	outb( BUSCONFIG, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 	outb( 0xFF, rSPIData1 );
 	outb( GPPUB, rSPIData2 ); //GPPUB
 	outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
@@ -143,35 +157,35 @@ void PythonIO::initDigitalIO(unsigned int direction)
 	
 	unsigned char byte0, byte1, byte2, byte3;
 	byte0 = (direction & 0x000000FF);
-	byte1 = (direction & 0x0000FF00) >> 8;
-	byte2 = (direction & 0x00FF0000) >> 16;
-	byte3 = (direction & 0xFF000000) >> 24;
+	byte1 = ((direction & 0x0000FF00) >> 8);
+	byte2 = ((direction & 0x00FF0000) >> 16);
+	byte3 = ((direction & 0xFF000000) >> 24);
 
 	printf("DIR 0=%d, DIR 1=%d, DIR 2=%d, DIR 3=%d\n", byte0, byte1, byte2, byte3);
 
 		outb( CHIP0, rSPIControl );	//Chip-select first on-board Digital I/O
-		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+		outb( BUSCONFIG, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte0, rSPIData1 );	//Set all 1's to set all to inputs
 		outb( IODIRA, rSPIData2 );	//IODIRA register = 0x00
 		outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 
 		outb( CHIP0, rSPIControl );	//Chip-select first on-board Digital I/O
-		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+		outb( BUSCONFIG, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte1, rSPIData1 );	//Set all 1's to set all to inputs
 		outb( IODIRB, rSPIData2 );	//IODIRB register = 0x01
 		outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 	//We've now initialized the first chip
 		outb( CHIP1, rSPIControl );	//Chip-select second on-board Digital I/O
-		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+		outb( BUSCONFIG, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte2, rSPIData1 );	//Set all 1's to set all to inputs
 		outb( IODIRA, rSPIData2 );	//IODIRA register = 0x00
 		outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
 		waitOnTransaction();
 
 		outb( CHIP1, rSPIControl );	//Chip-select second on-board Digital I/O
-		outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+		outb( BUSCONFIG, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 		outb( byte3, rSPIData1 );	//Set all 1's to set all to inputs
 		outb( IODIRB, rSPIData2 );	//IODIRB register = 0x01
 		outb( WRITECMD, rSPIData3 );	//The R/W bit(bit 0) should be 0 == write
@@ -184,7 +198,7 @@ void PythonIO::initDigitalIO(unsigned int direction)
 void PythonIO::setPullup(bool enable)
 {
 	outb( CHIP0, rSPIControl );	//Chip-select first on-board Digital I/O
-	outb( 0x30, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
+	outb( BUSCONFIG, rSPIStatus );	//irq3, 8.3MHz, int disabled, shift Msb
 	outb( 0x
 }
 */

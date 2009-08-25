@@ -43,6 +43,7 @@
 	#define WRITECMD	0x40
 	#define IODIRA		0x00
 	#define IODIRB		0x01
+	#define BUSCONFIG	0x30
 #endif
 
 
