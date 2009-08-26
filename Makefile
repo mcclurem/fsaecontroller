@@ -46,4 +46,4 @@ permissions:
 		chmod +s main
 
 clean:
-	    rm -rf *o *.gch main dataparser inputtest dascontrol pwmloop pwmset tabletest
+	    rm -rf *o *.gch main dataparser inputtest outputtest dascontrol pwmloop pwmset tabletest
