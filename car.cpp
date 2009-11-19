@@ -37,7 +37,6 @@ Car::Car()
 
 void Car::run()
 {
-	inputQuery();
 	do
 	{
 		inputQuery();//Query the ins to simplify each loop
