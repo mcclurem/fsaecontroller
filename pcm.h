@@ -9,7 +9,7 @@ class PCM
 {
 	public:
 		PCM(unsigned short base_address);
-		void getDigital(int byte);
+		unsigned char getDigital(int byte);
 
 	private:
 		unsigned short portA0;
