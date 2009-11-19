@@ -1,4 +1,5 @@
 
+#include <sys/io.h>
 
 
 #ifndef PCM_H

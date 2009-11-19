@@ -16,6 +16,20 @@ PCM::PCM(unsigned short base_address)
 
 }
 
-void PCM::getDigital(int byte)
+unsigned char PCM::getDigital(int byte)
 {
+	unsigned short address;
+	switch(byte)
+	{
+		case 0: address = portA0; break;
+		case 1: address = portB0; break;
+		case 2: address = portC0; break;
+		case 3: address = portA1; break;
+		case 4: address = portB1; break;
+		case 5: address = portC1; break;
+		default: address = portA0;
+	};
+	return inw(address);
 }
+
+
