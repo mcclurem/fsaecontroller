@@ -28,8 +28,9 @@ class Car
 		inline void ensureNeutral();
 		inline void throttleCalc(float percentage);
 		
-		VCMDAS * das;
-		PythonIO * board;
+		VCMDAS *das;
+		VCMDAS *das2;
+		PythonIO *board;
 
 		Table *gasMap;
 		Table *electricMap;

@@ -134,7 +134,7 @@ void Car::gasLoop()
 //RPM value accurately is going to be important
 
 	if(engineRPM < 500)
-			startGas();
+		startGas();
 
 }
 
@@ -404,4 +404,3 @@ inline void Car::throttleCalc(float percentage)
 	if(throttleOut > max_duty)
 			throttleOut = max_duty;
 }
-
