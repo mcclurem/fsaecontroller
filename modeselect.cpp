@@ -1,11 +1,11 @@
 
 #include "vcmdas.h"
-
+#include "definitions.h"
 
 
 
 int main(){
-	das = new VCMDAS(0x300);
+	VCMDAS * das = new VCMDAS(0x300);
 	unsigned short digin = das->getDigital();
 	if(bitof(1,digin) and !bitof(2,digin))
 		return 0;
