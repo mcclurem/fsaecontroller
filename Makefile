@@ -5,13 +5,17 @@ CXXFLAGS="-O1"
 all: binary dataparser 
 
 binary: python.o vcmdas.o table.o car.o
-	    g++ -static python.o vcmdas.o table.o car.o main.cpp -o main
+	g++ -static python.o vcmdas.o table.o car.o main.cpp -o main
 
 inputtest: python.o vcmdas.o
-		g++ -static python.o vcmdas.o inputtest.cpp -o inputtest
+	g++ -static python.o vcmdas.o inputtest.cpp -o inputtest
 
 outputtest: python.o vcmdas.o
-		g++ -static python.o vcmdas.o outputtest.cpp -o outputtest
+	g++ -static python.o vcmdas.o outputtest.cpp -o outputtest
+
+modeselect: vcmdas.o
+	g++ -static vcmdas.o modeselect.cpp -o modeselect
+	
 
 
 dataparser:
