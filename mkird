@@ -117,13 +117,13 @@ do
 done
 cat >> /mnt/initrd/linuxrc << EOF
 else
+	mount /dev/$ROOTDEV /new_root
+	cd /new_root
+	echo 0x0100 >/proc/sys/kernel/real-root-dev
+	pivot_root . ./mnt/initrd
+	umount /mnt/initrd/proc
 	/bin/autobuild
 fi
-mount /dev/$ROOTDEV /new_root
-cd /new_root
-echo 0x0100 >/proc/sys/kernel/real-root-dev
-pivot_root . ./mnt/initrd
-umount /mnt/initrd/proc
 #/bin/bash --login
 exec chroot . /sbin/init </dev/console >/dev/console 2>&1
 EOF
