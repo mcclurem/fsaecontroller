@@ -108,14 +108,17 @@ echo "Simple initrd is active"
 echo
 mount -t proc /proc /proc
 mount -t sysfs none /sys
+/bin/modeselect
+if [ $? == 0 ]; then
 EOF
-
 for BINARY in $EXECUTABLES
 do
 	echo "/bin/$BINARY" >> /mnt/initrd/linuxrc
 done
-
 cat >> /mnt/initrd/linuxrc << EOF
+else
+	/bin/autobuild
+fi
 mount /dev/$ROOTDEV /new_root
 cd /new_root
 echo 0x0100 >/proc/sys/kernel/real-root-dev
