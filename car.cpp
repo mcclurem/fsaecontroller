@@ -20,6 +20,9 @@
 #define STARTER_OFF bitunset(7, &digOut2)
 #define STARTER_ON bitset(7, &digOut2)
 
+#define WDOG_OFF bitunset(0, &digOut2)
+#define WDOG_ON bitset(0, &digOut2)
+
 #define LED1_ON bitset(1, &digOut2)
 #define LED1_OFF bitunset(1, &digOut2)
 

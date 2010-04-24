@@ -33,6 +33,6 @@ unsigned char PCM::getDigital(int byte)
 		case 5: address = portC1; break;
 		default: address = portA0;
 	};
-	return inw(address);
+	return inb(address);
 }
 
