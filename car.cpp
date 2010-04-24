@@ -48,7 +48,7 @@
 
 
 Car::Car()
-{
+{ 
 		das1 = new VCMDAS();
 		das2 = new VCMDAS(0x310);
 		pcm = new PCM(0x320);
@@ -60,9 +60,9 @@ Car::Car()
 
 
 void Car::run()
-{
+{ 
 	do
- 	{
+  	{
 		toggleWatchDog();
 		inputQuery();//Query the ins to simplify each loop
 		
@@ -98,13 +98,12 @@ void Car::run()
 				LED4_OFF;
 				MC_OFF;
 				BANK_OFF;
-				IGN_ON;
 			//Set the Mode state variable
 				mode = GAS;
-			}
+ 			}
 			gasLoop();
 
-		}
+ 		}
 		
 
 		//Electric
@@ -154,6 +153,10 @@ void Car::run()
 
 void Car::gasLoop()
 { 
+	if( bitof(1, digIn2))
+		IGN_ON;
+	else
+		IGN_OFF;
 
 	throttleCalc(pedalPosition);
 
