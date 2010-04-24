@@ -40,6 +40,7 @@ Car::Car()
 {
 		das1 = new VCMDAS();
 		das2 = new VCMDAS(0x310);
+		pcm = new PCM(0x320);
 		//Set das1 up as all outputs
 		das1->setDigitalDirection(2, false);
 		throttleCalc(0.);
@@ -85,7 +86,6 @@ void Car::run()
 			{
 				MC_ON;
 				BANK_ON;
-				FUEL_ON;
 				IGN_ON;
 			//Set the Mode state variable
 				mode = HYBRID;
@@ -102,7 +102,6 @@ void Car::run()
 			{
 				MC_OFF;
 				BANK_OFF;
-				FUEL_ON;
 				IGN_ON;
 			//Set the Mode state variable
 				mode = GAS;
@@ -120,7 +119,6 @@ void Car::run()
 			{
 				MC_ON;
 				BANK_ON;
-				FUEL_OFF;
 				IGN_OFF;
 				FAN_OFF;
 				throttleCalc(0.); //Close the throttle
@@ -138,7 +136,6 @@ void Car::run()
 			if( mode != FAULT )
 			{
 				FAN_OFF;
-				FUEL_OFF;
 				BANK_OFF;
 				MC_OFF;
 				IGN_OFF;
@@ -259,23 +256,27 @@ void Car::writeOutputs()
 //	board->setDigital(1, digOut1);
 //	board->setDigital(2, digOut2);
 
-	word digout;
-	digout.lsb = digOut1;
-	digout.msb = digOut2;
-	das1->setDigital(digout.value);
-
-
+	writeDigital();
+/*
 	//Get our cap status
 	word dasIn;
 	dasIn.value = das->getDigital();
 	capWarn = dasIn.lsb;
 	capStop = dasIn.msb;
-
+*/
 	//Write out to the electric
 	unsigned short throt = (unsigned short)(electricThrottlePercentage * 4095.);
 	unsigned short regen = (unsigned short)(electricRegenPercentage * 4095.);
-	das->setAnalog(0, throt);
-	das->setAnalog(1, regen);
+	das2->setAnalog(0, throt);
+	das2->setAnalog(1, regen);
+}
+
+inline void Car::writeDigital()
+{
+	word digout;
+	digout.lsb = digOut1;
+	digout.msb = digOut2;
+	das1->setDigital(digout.value);
 }
 
 
@@ -302,6 +303,7 @@ inline void Car::shiftHandler()
 //short-circuiting so we aren't adding to runtime except
 //when necessary
 
+/* COMMENTED TO REDUCE DEBUGGING HEADACHE
 	//upshift routine
 		if(bitof(5, digIn1) && bitof(5, board->getDigital(0)) && !upShifted)
 		{
@@ -355,6 +357,8 @@ inline void Car::shiftHandler()
 		if(!bitof(6, digIn1))
 			downShifted = false;
 
+*/
+
 }
 
 void Car::startGas()
@@ -374,13 +378,14 @@ void Car::startGas()
 			writeOutputs();
 			usleep(10000);//Pause 10Msec to allow for throttle to close
 		}
+		STARTER_ON;
 		bitset(7, &digOut2); //Starter relay on
-		board->setDigital(2, digOut2);
+		writeDigital();
 		usleep(10000); //10Msec pause
 
 	}
-	bitunset(7, &digOut2); //Starter relay off
-	board->setDigital(2, digOut2); //Trigger relay off
+	STARTER_OFF; //Starter relay off
+	writeDigital(); //Trigger relay off
 	if( timeout > 1 )
 		bitunset(4, &digOut1);
 	else
@@ -415,7 +420,7 @@ inline void Car::ensureNeutral()
 			return;
 //Clutch
 	bitset(0, &digOut2); //Clutch on
-	board->setDigital(2, digOut2); //Trigger it
+	writeDigital(); //Trigger it
 	usleep(500000); // 1/2 sec sleep to allow clutch to pop
 	do
 	{
@@ -423,18 +428,18 @@ inline void Car::ensureNeutral()
 				break;
 	//Shift
 		bitset(2, &digOut2); //We throw the down shift
-		board->setDigital(2, digOut2); //Trigger it
+		writeDigital(); //Trigger it
 		usleep(500000); // 1/2 sec sleep to allow shift to occur
 	//Release
 		bitunset(2, &digOut2); //Now we release the shift
-		board->setDigital(2, digOut2); //Trigger it
+		writeDigital(); //Trigger it
 		usleep(500000); // 1/2 sec sleep to allow shift to rebound
 
 	}while(true);
 
 //Clutch Release
 	bitunset(0, &digOut2); //Clutch release
-	board->setDigital(2, digOut2); //Trigger it
+	writeDigital(); //Trigger it
 }
 
 inline void Car::throttleCalc(float percentage)

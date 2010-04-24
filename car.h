@@ -2,7 +2,7 @@
 #include "definitions.h"
 #include "table.h"
 #include "vcmdas.h"
-#include "python_io.h"
+#include "pcm.h"
 
 
 
@@ -27,10 +27,11 @@ class Car
 		inline void shiftHandler();
 		inline void ensureNeutral();
 		inline void throttleCalc(float percentage);
+		inline void writeDigital();
 		
 		VCMDAS *das1;
 		VCMDAS *das2;
-		PythonIO *board;
+		PCM *pcm;
 
 		Table *gasMap;
 		Table *electricMap;

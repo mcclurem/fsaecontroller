@@ -15,8 +15,8 @@ PCM::PCM(unsigned short base_address)
 	gateReg = base_address + 9;
 
 	//Set all our ports up as inputs
-	outb(confReg0, 0x9B);
-	outb(confReg1, 0x9B);
+	outb(0x9B, confReg0);
+	outb(0x9B, confReg1);
 
 }
 
