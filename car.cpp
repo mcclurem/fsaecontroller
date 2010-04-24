@@ -128,23 +128,6 @@ void Car::run()
 		}
 
 
-		//FAULT
-		if(!bitof(0,digIn1) && !bitof(1, digIn1))
-		{
-			//need to set some state variables on first entry:
-			if( mode != FAULT )
-			{
-				FAN_OFF;
-				BANK_OFF;
-				MC_OFF;
-				IGN_OFF;
-				throttleCalc(0.); //Close the throttle
-			//Set the Mode state variable
-				mode = FAULT;
-			}
-		}
-
-
 		writeOutputs();
 	}while(true);
 }
