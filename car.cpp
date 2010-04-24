@@ -185,12 +185,14 @@ void Car::electricLoop()
 
 void Car::hybridLoop()
 {
+/*
 	float currentEngineTorque = gasMap->lookup(engineRPM, throttlePosition);
 	float currentMotorTorque = electricMap->lookup(engineRPM, electricThrottlePercentage);
 	//How does this shit work?
 
 	shiftHandler();
 	fanHandler();
+	*/
 }
 
 
