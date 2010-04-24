@@ -14,6 +14,10 @@ PCM::PCM(unsigned short base_address)
 	directionReg = base_address + 8;
 	gateReg = base_address + 9;
 
+	//Set all our ports up as inputs
+	outb(confReg0, 0x9B);
+	outb(confReg1, 0x9B);
+
 }
 
 unsigned char PCM::getDigital(int byte)
@@ -31,5 +35,4 @@ unsigned char PCM::getDigital(int byte)
 	};
 	return inw(address);
 }
-
 

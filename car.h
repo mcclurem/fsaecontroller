@@ -28,7 +28,7 @@ class Car
 		inline void ensureNeutral();
 		inline void throttleCalc(float percentage);
 		
-		VCMDAS *das;
+		VCMDAS *das1;
 		VCMDAS *das2;
 		PythonIO *board;
 
@@ -51,6 +51,8 @@ class Car
 
 		float pedalPosition;
 		float brakePosition;
+		float brakeFrontPressure;
+		float brakeRearPressure;
 		float waterTemp;
 		float bankVoltage;
 		float throttlePosition;

@@ -3,35 +3,47 @@
 
 #define GAS_SWITCH (bitof(0, digIn1))
 #define ELECTRIC_SWITCH (bitof(1, digIn1))
-#define ESTOP (bitof(0, digIn2))
+#define ESTOP (bitof(0, digIn1))
 
-#define BANK_OFF bitunset(3, &digOut2)
-#define BANK_ON bitset(3, &digOut2)
+#define BANK_OFF bitunset(3, &digOut1)
+#define BANK_ON bitset(3, &digOut1)
 
-#define FUEL_OFF bitunset(5, &digOut2)
-#define FUEL_ON bitset(5, &digOut2)
+#define MC_OFF bitunset(4, &digOut1)
+#define MC_ON bitset(4, &digOut1)
 
-#define MC_OFF bitunset(7, &digOut1)
-#define MC_ON bitset(7, &digOut1)
+#define IGN_OFF bitunset(5, &digOut1)
+#define IGN_ON bitset(5, &digOut1)
 
-#define IGN_OFF bitunset(6, &digOut2)
-#define IGN_ON bitset(6, &digOut2)
+#define FAN_OFF bitunset(6, &digOut2)
+#define FAN_ON bitset(6, &digOut2)
 
-#define FAN_OFF bitunset(4, &digOut2)
-#define FAN_ON bitset(4, &digOut2)
+#define STARTER_OFF bitunset(7, &digOut2)
+#define STARTER_ON bitset(7, &digOut2)
 
+#define LED1_ON bitset(1, &digOut2)
+#define LED1_OFF bitunset(1, &digOut2)
+
+#define LED2_ON bitset(2, &digOut2)
+#define LED2_OFF bitunset(2, &digOut2)
+
+#define LED3_ON bitset(3, &digOut2)
+#define LED3_OFF bitunset(3, &digOut2)
+
+#define LED4_ON bitset(4, &digOut2)
+#define LED4_OFF bitunset(4, &digOut2)
+
+#define LED5_ON bitset(5, &digOut2)
+#define LED5_OFF bitunset(5, &digOut2)
 
 
 Car::Car()
 {
-		das = new VCMDAS();
-		board = new PythonIO();
-		
-		das->setDigitalDirection(2, false);
+		das1 = new VCMDAS();
+		das2 = new VCMDAS(0x310);
+		//Set das1 up as all outputs
+		das1->setDigitalDirection(2, false);
 		throttleCalc(0.);
-		board->setPWMDuty(throttleOut);
-		board->initDigitalIO(0xFF0000FF);
-}
+} 
 
 
 
@@ -39,6 +51,30 @@ void Car::run()
 {
 	do
 	{
+		LED1_ON;
+		usleep(10000);
+		LED2_ON;
+		usleep(10000);
+		LED3_ON;
+		usleep(10000);
+		LED4_ON;
+		usleep(10000);
+		LED5_ON;
+		usleep(10000);
+
+		LED1_OFF;
+		usleep(10000);
+		LED2_OFF;
+		usleep(10000);
+		LED3_OFF;
+		usleep(10000);
+		LED4_OFF;
+		usleep(10000);
+		LED5_OFF;
+		usleep(10000);
+	}while(true);	
+	do
+ 	{
 		inputQuery();//Query the ins to simplify each loop
 		
 		//Hybrid
@@ -120,7 +156,7 @@ void Car::run()
 
 
 void Car::gasLoop()
-{
+{ 
 
 	throttleCalc(pedalPosition);
 
@@ -159,8 +195,8 @@ void Car::electricLoop()
 		electricRegenPercentage = brakePosition;
 		bitunset(5, &digOut1); //ThrottleDisable
 		bitset(6, &digOut1); //Regen Enable
-	}
-}
+ 	}
+} 
 
 
 
@@ -178,46 +214,56 @@ void Car::hybridLoop()
 
 void Car::inputQuery()
 {
-	digIn1 = board->getDigital(0);
-	digIn2 = board->getDigital(3);
-	
+	capWarn = pcm->getDigital(0);
+	capStop = pcm->getDigital(1);
+	//fetch port C0
+	digIn1 = pcm->getDigital(2);
+	//fetch port A1
+	digIn2 = pcm->getDigital(3);
+
+
 	//Now we go ahead and pull all the VCMDas analog inputs
-	pedalPosition = ((float)das->getRawAnalog(0))/32767.;
-	brakePosition = ((float)das->getRawAnalog(1))/32767.;
+	pedalPosition = ((float)das1->getRawAnalog(9))/32767.;
+	brakePosition = ((float)das1->getRawAnalog(8))/32767.;
 
 	//These all need calibrating
-	waterTemp = ((float)das->getRawAnalog(2))/32767.;
-	throttlePosition = ((float)das->getRawAnalog(3))/32767.;
-	bankVoltage = ((float)das->getRawAnalog(4))/32767.;
-	shiftPressure = ((float)das->getRawAnalog(5))/32767.;
-
+	throttlePosition = ((float)das1->getRawAnalog(15))/32767.;
+	bankVoltage = ((float)das1->getRawAnalog(11))/32767.;
+	shiftPressure = ((float)das1->getRawAnalog(10))/32767.;
+/*
 	cap0Temp = ((float)das->getRawAnalog(6))/32767.;
 	cap1Temp = ((float)das->getRawAnalog(7))/32767.;
 	cap2Temp = ((float)das->getRawAnalog(8))/32767.;
 	cap3Temp = ((float)das->getRawAnalog(9))/32767.;
 	cap4Temp = ((float)das->getRawAnalog(10))/32767.;
 	cap5Temp = ((float)das->getRawAnalog(11))/32767.;
-	
-	frontLeftRPM = ((float)das->getRawAnalog(12))/32767.;
-	frontRightRPM = ((float)das->getRawAnalog(13))/32767.;
-	rearLeftRPM = ((float)das->getRawAnalog(14))/32767.;
-	rearRightRPM = ((float)das->getRawAnalog(15))/32767.;
+*/
 
-	engineRPM = board->getFreq(0);
+	waterTemp = ((float)das2->getRawAnalog(0))/32767.;
+	
+	frontLeftRPM = ((float)das2->getRawAnalog(1))/32767.;
+	frontRightRPM = ((float)das2->getRawAnalog(2))/32767.;
+	rearLeftRPM = ((float)das2->getRawAnalog(3))/32767.;
+	rearRightRPM = ((float)das2->getRawAnalog(4))/32767.;
+	brakeFrontPressure = ((float)das2->getRawAnalog(5))/32767.;
+	brakeRearPressure = ((float)das2->getRawAnalog(6))/32767.;
+
+	engineRPM = ((float)das2->getRawAnalog(7))/32767.;
 }
 
 
 
 void Car::writeOutputs()
 {
-	//We throw in a little hysteresis here in order to prevent
-	//spazzing of the servo
-	if(throttleOutPrevious != throttleOut)
-		board->setPWMDuty(throttleOut);
-
 	//Write our two python digital outs
-	board->setDigital(1, digOut1);
-	board->setDigital(2, digOut2);
+//	board->setDigital(1, digOut1);
+//	board->setDigital(2, digOut2);
+
+	word digout;
+	digout.lsb = digOut1;
+	digout.msb = digOut2;
+	das1->setDigital(digout.value);
+
 
 	//Get our cap status
 	word dasIn;
@@ -392,7 +438,8 @@ inline void Car::ensureNeutral()
 }
 
 inline void Car::throttleCalc(float percentage)
-{
+{	
+/*
 //Before setting new throttle output, store previous value for hysterisis
 	throttleOutPrevious = throttleOut;
 
@@ -403,4 +450,5 @@ inline void Car::throttleCalc(float percentage)
 			throttleOut = min_duty;
 	if(throttleOut > max_duty)
 			throttleOut = max_duty;
+*/
 }
