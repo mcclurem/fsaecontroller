@@ -158,12 +158,12 @@ void Car::gasLoop()
 	else
 		IGN_OFF;
 
-	throttleCalc(pedalPosition);
+//	throttleCalc(pedalPosition);
 
 //Fans with some hysterisis
-	fanHandler();
+//	fanHandler();
 //Handle shifting
-	shiftHandler();
+//	shiftHandler();
 
 //If tach is less than 500RPM then engine is not running
 //This block is a very simple starting routine, setting this particular
