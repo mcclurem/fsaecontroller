@@ -1,8 +1,9 @@
 
 #include "car.h"
 
-#define GAS_SWITCH (bitof(0, digIn1))
-#define ELECTRIC_SWITCH (bitof(1, digIn1))
+#define MODE_BIT_1 (bitof(5, digIn2))
+#define MODE_BIT_2 (bitof(6, digIn2))
+#define MODE_BIT_3 (bitof(7, digIn2))
 #define ESTOP (bitof(0, digIn1))
 
 #define BANK_OFF bitunset(3, &digOut1)
@@ -82,7 +83,7 @@ void Car::run()
 		inputQuery();//Query the ins to simplify each loop
 		
 		//Hybrid
-		if(GAS_SWITCH && ELECTRIC_SWITCH && !ESTOP)
+		if(MODE_BIT_1 && MODE_BIT_2 && !ESTOP)
 		{
 			//need to set some state variables on first entry:
 			if( mode != HYBRID )
@@ -98,7 +99,7 @@ void Car::run()
 
 
 		//Gas
-		if(GAS_SWITCH && !ELECTRIC_SWITCH && !ESTOP)
+		if(MODE_BIT_1 && !MODE_BIT_2 && !ESTOP)
 		{
 			//need to set some state variables on first entry:
 			if( mode != GAS )
@@ -115,7 +116,7 @@ void Car::run()
 		
 
 		//Electric
-		if(!GAS_SWITCH && ELECTRIC_SWITCH && !ESTOP)
+		if(!MODE_BIT_1 && MODE_BIT2 && !ESTOP)
 		{
 			//need to set some state variables on first entry:
 			if( mode != ELECTRIC )
