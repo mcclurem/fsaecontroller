@@ -1,9 +1,16 @@
 
 #include "car.h"
 
-#define MODE_BIT_1 (bitof(5, digIn2))
-#define MODE_BIT_2 (bitof(6, digIn2))
-#define MODE_BIT_3 (bitof(7, digIn2))
+#define MODE_BIT_1 (bitof(5, digIn1))
+#define MODE_BIT_2 (bitof(6, digIn1))
+#define MODE_BIT_3 (bitof(7, digIn1))
+
+#define MODE_0 (MODE_BIT_1 && MODE_BIT_2 && MODE_BIT_3)
+#define MODE_1 (!MODE_BIT_1 && MODE_BIT_2 && MODE_BIT_3)
+#define MODE_2 (MODE_BIT_1 && !MODE_BIT_2 && MODE_BIT_3)
+#define MODE_3 (!MODE_BIT_1 && !MODE_BIT_2 && MODE_BIT_3)
+#define MODE_4 (MODE_BIT_1 && MODE_BIT_2 && !MODE_BIT_3)
+
 #define ESTOP (bitof(0, digIn1))
 
 #define BANK_OFF bitunset(3, &digOut1)
