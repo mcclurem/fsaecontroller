@@ -67,7 +67,7 @@ void Car::run()
 		inputQuery();//Query the ins to simplify each loop
 		
 		//Hybrid
-		if(MODE_1 && !ESTOP)
+		if(MODE_1)
 		{
 			//need to set some state variables on first entry:
 			if( mode != HYBRID )
@@ -87,7 +87,7 @@ void Car::run()
 
 
 		//Gas
-		if(MODE_0 && !ESTOP)
+		if(MODE_0)
 		{
 			//need to set some state variables on first entry:
 			if( mode != GAS )
@@ -108,7 +108,7 @@ void Car::run()
 		
 
 		//Electric
-		if(MODE_2 && !ESTOP)
+		if(MODE_2)
 		{
 			//need to set some state variables on first entry:
 			if( mode != ELECTRIC )
