@@ -62,35 +62,12 @@ Car::Car()
 void Car::run()
 {
 	do
-	{
-		LED1_ON;
-		usleep(10000);
-		LED2_ON;
-		usleep(10000);
-		LED3_ON;
-		usleep(10000);
-		LED4_ON;
-		usleep(10000);
-		LED5_ON;
-		usleep(10000);
-
-		LED1_OFF;
-		usleep(10000);
-		LED2_OFF;
-		usleep(10000);
-		LED3_OFF;
-		usleep(10000);
-		LED4_OFF;
-		usleep(10000);
-		LED5_OFF;
-		usleep(10000);
-	}while(true);	
-	do
  	{
+		toggleWatchDog();
 		inputQuery();//Query the ins to simplify each loop
 		
 		//Hybrid
-		if(MODE_BIT_1 && MODE_BIT_2 && !ESTOP)
+		if(MODE_1 && !ESTOP)
 		{
 			//need to set some state variables on first entry:
 			if( mode != HYBRID )
@@ -106,7 +83,7 @@ void Car::run()
 
 
 		//Gas
-		if(MODE_BIT_1 && !MODE_BIT_2 && !ESTOP)
+		if(MODE_0 && !ESTOP)
 		{
 			//need to set some state variables on first entry:
 			if( mode != GAS )
@@ -123,7 +100,7 @@ void Car::run()
 		
 
 		//Electric
-		if(!MODE_BIT_1 && MODE_BIT2 && !ESTOP)
+		if(MODE_2 && !ESTOP)
 		{
 			//need to set some state variables on first entry:
 			if( mode != ELECTRIC )
@@ -176,7 +153,7 @@ void Car::gasLoop()
 //If tach is less than 500RPM then engine is not running
 //This block is a very simple starting routine, setting this particular
 //RPM value accurately is going to be important
-
+	STARTER_OFF;
 	if(engineRPM < 500)
 		startGas();
 
@@ -374,6 +351,10 @@ inline void Car::shiftHandler()
 
 void Car::startGas()
 {
+	if( bitof(2, digIn2))
+		STARTER_ON;
+	return;
+
 	int timeout;
 	//Starter is being pressed? (bitof(2, digIn1)
 	if( !bitof(2, digIn1) )
