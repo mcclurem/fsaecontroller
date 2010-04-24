@@ -72,6 +72,10 @@ void Car::run()
 			//need to set some state variables on first entry:
 			if( mode != HYBRID )
 			{
+				LED1_OFF;
+				LED2_ON;
+				LED3_OFF;
+				LED4_OFF;
 				MC_ON;
 				BANK_ON;
 				IGN_ON;
@@ -88,6 +92,10 @@ void Car::run()
 			//need to set some state variables on first entry:
 			if( mode != GAS )
 			{
+				LED1_ON;
+				LED2_OFF;
+				LED3_OFF;
+				LED4_OFF;
 				MC_OFF;
 				BANK_OFF;
 				IGN_ON;
@@ -105,6 +113,10 @@ void Car::run()
 			//need to set some state variables on first entry:
 			if( mode != ELECTRIC )
 			{
+				LED1_OFF;
+				LED2_OFF;
+				LED3_ON;
+				LED4_OFF;
 				MC_ON;
 				BANK_ON;
 				IGN_OFF;
