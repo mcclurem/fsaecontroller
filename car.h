@@ -73,7 +73,7 @@ class Car
 		float engineRPM;
 
 		//Keep track of the watchdog
-		bool dog-stat;
+		bool dog_stat;
 
 	//Two state variables used to prevent accidental double shifts
 		bool upshifted;
