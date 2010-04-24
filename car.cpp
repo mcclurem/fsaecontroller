@@ -51,7 +51,7 @@ Car::Car()
 { 
 		das1 = new VCMDAS();
 		das2 = new VCMDAS(0x310);
-		pcm = new PCM(0x320);
+		pcm = new PCM(0x200);
 		//Set das1 up as all outputs
 		das1->setDigitalDirection(2, false);
 		throttleCalc(0.);
