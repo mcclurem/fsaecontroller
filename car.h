@@ -28,6 +28,7 @@ class Car
 		inline void ensureNeutral();
 		inline void throttleCalc(float percentage);
 		inline void writeDigital();
+		inline void toggleWatchDog();
 		
 		VCMDAS *das1;
 		VCMDAS *das2;
@@ -70,6 +71,9 @@ class Car
 		float rearLeftRPM;
 		float rearRightRPM;
 		float engineRPM;
+
+		//Keep track of the watchdog
+		bool dog-stat;
 
 	//Two state variables used to prevent accidental double shifts
 		bool upshifted;

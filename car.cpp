@@ -411,6 +411,19 @@ void Car::startGas()
 */
 }
 
+inline void Car::toggleWatchDog()
+{
+	if(dog-stat)
+	{
+		WDOG_OFF;
+		dog-stat = false;
+	}
+	else
+	{
+		WDOG_ON;
+		dog-stat = true;
+	}
+}
 
 
 /******Super Safe Neutral Finding Routine******/
