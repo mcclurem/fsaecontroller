@@ -6,7 +6,7 @@
 
 int main(){
 	PCM * pcm = new PCM(0x200);
-	unsigned short digin = das->getDigital();
+	unsigned short digin = pcm->getDigital(5);
 	if(bitof(7,digin))
 	{
 		return 0;
