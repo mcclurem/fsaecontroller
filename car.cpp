@@ -82,6 +82,8 @@ void Car::run()
 				LED2_OFF;
 				LED3_OFF;
 				LED4_OFF;
+				LED5_OFF;
+				LED6_OFF;
 				MC_OFF;
 				BANK_OFF;
 			//Set the Mode state variable
@@ -101,6 +103,8 @@ void Car::run()
 				LED2_ON;
 				LED3_OFF;
 				LED4_OFF;
+				LED5_OFF;
+				LED6_OFF;
 				MC_ON;
 				BANK_ON;
 				IGN_ON;
@@ -120,6 +124,8 @@ void Car::run()
 				LED2_OFF;
 				LED3_ON;
 				LED4_OFF;
+				LED5_OFF;
+				LED6_OFF;
 				MC_ON;
 				BANK_ON;
 				IGN_OFF;
@@ -137,6 +143,8 @@ void Car::run()
 			LED2_OFF;
 			LED3_OFF;
 			LED4_ON;
+			LED5_OFF;
+			LED6_OFF;
 		}
 
 
