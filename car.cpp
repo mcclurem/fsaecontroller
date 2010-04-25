@@ -60,6 +60,7 @@ Car::Car()
 		pcm = new PCM(0x200);
 		//Set das1 up as all outputs
 		das1->setDigitalDirection(2, false);
+		das2->setDigitalDirection(2, false);
 		throttleCalc(0.);
 } 
 
