@@ -17,7 +17,8 @@ PCM::PCM(unsigned short base_address)
 	//Set all our ports up as inputs
 	outb(0x9B, confReg0);
 	outb(0x9B, confReg1);
-
+	outb(0x00, directionReg);
+	outb(0xFF, gateReg);
 }
 
 unsigned char PCM::getDigital(int byte)
