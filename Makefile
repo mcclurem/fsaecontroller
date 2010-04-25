@@ -1,10 +1,10 @@
 # This optimization is neccessary for inline expansion
 # of functions
-CXXFLAGS="-O1"
+CXXFLAGS=-O1
 
 all: binary 
 
-binary: table.o car.o pcm.o
+binary: vcmdas.o table.o car.o pcm.o
 	g++ $(CXXFLAGS) -static pcm.o vcmdas.o table.o car.o main.cpp -o main
 
 inputtest: python.o vcmdas.o
