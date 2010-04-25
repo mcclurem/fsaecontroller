@@ -65,27 +65,7 @@ void Car::run()
   	{
 		toggleWatchDog();
 		inputQuery();//Query the ins to simplify each loop
-		
-		//Hybrid
-		if(MODE_1)
-		{
-			//need to set some state variables on first entry:
-			if( mode != HYBRID )
-			{
-				LED1_OFF;
-				LED2_ON;
-				LED3_OFF;
-				LED4_OFF;
-				MC_ON;
-				BANK_ON;
-				IGN_ON;
-			//Set the Mode state variable
-				mode = HYBRID;
-			}
-				hybridLoop();
-		}
-
-
+	
 		//Gas
 		if(MODE_0)
 		{
@@ -105,6 +85,24 @@ void Car::run()
 
  		}
 		
+		//Hybrid
+		if(MODE_1)
+		{
+			//need to set some state variables on first entry:
+			if( mode != HYBRID )
+			{
+				LED1_OFF;
+				LED2_ON;
+				LED3_OFF;
+				LED4_OFF;
+				MC_ON;
+				BANK_ON;
+				IGN_ON;
+			//Set the Mode state variable
+				mode = HYBRID;
+			}
+				hybridLoop();
+		}	
 
 		//Electric
 		if(MODE_2)
@@ -125,6 +123,14 @@ void Car::run()
 				mode = ELECTRIC;
 			}
 			electricLoop();
+		}
+
+		if(MODE_3)
+		{
+			LED1_OFF;
+			LED2_OFF;
+			LED3_OFF;
+			LED4_ON;
 		}
 
 
