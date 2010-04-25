@@ -41,6 +41,7 @@ class Car
 		unsigned char digIn2;
 		unsigned char digOut1;
 		unsigned char digOut2;
+		unsigned char digOut3;
 		unsigned char capWarn;
 		unsigned char capStop;
 		unsigned char throttleOutPrevious;

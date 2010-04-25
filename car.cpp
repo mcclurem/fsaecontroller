@@ -43,8 +43,14 @@
 #define LED4_ON bitset(4, &digOut2)
 #define LED4_OFF bitunset(4, &digOut2)
 
-#define LED5_ON bitset(5, &digOut2)
-#define LED5_OFF bitunset(5, &digOut2)
+#define LED5_ON bitset(5, &digOut3)
+#define LED5_OFF bitunset(5, &digOut3)
+
+#define LED6_ON bitset(6, &digOut3)
+#define LED6_OFF bitunset(6, &digOut3)
+
+#define GTFO_ON bitset(5, &digOut2)
+#define GTFO_OFF bitunset(5, &digOut2)
 
 
 Car::Car()
@@ -271,6 +277,9 @@ inline void Car::writeDigital()
 	digout.lsb = digOut1;
 	digout.msb = digOut2;
 	das1->setDigital(digout.value);
+	digout.lsb = digOut3;
+	digout.msb = 0;
+	das2->setDigital(digout.value);
 }
 
 
