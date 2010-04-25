@@ -1,15 +1,26 @@
 
-#include "vcmdas.h"
+#include "pcm.h"
 #include "definitions.h"
 
 
 
 int main(){
-	VCMDAS * das = new VCMDAS(0x300);
+	PCM * pcm = new PCM(0x200);
 	unsigned short digin = das->getDigital();
-	if(bitof(1,digin) and !bitof(2,digin))
+	if(bitof(7,digin))
+	{
 		return 0;
+	}
 	else
-		return 1;
+	{
+		if(bitof(6, digin))
+		{
+			return 2;
+		}
+		else
+		{
+			return 1;
+		}
+	}
 
 }

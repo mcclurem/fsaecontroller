@@ -3,6 +3,7 @@
 
 PCM::PCM(unsigned short base_address)
 {
+	iopl(3);
 	portA0 = base_address + 0;
 	portB0 = base_address + 1;
 	portC0 = base_address + 2;
