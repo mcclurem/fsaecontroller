@@ -72,6 +72,9 @@ do
 	chmod +x /mnt/initrd/bin
 done
 
+cp modeselect /mnt/initrd/bin
+
+
 # Grab busybox and create the symbolic links
 cp ./busybox-1.13.2/busybox /mnt/initrd/bin
 cd /mnt/initrd/bin
